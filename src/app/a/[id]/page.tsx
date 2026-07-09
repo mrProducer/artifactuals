@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/avatar";
+import { resolveAvatarUrl } from "@/lib/profile";
 import { ArtifactFrame } from "@/components/artifact-frame";
 import { LikeButton } from "@/components/like-button";
 import { ShareButtons } from "@/components/share-buttons";
@@ -17,7 +18,7 @@ async function getArtifact(id: string) {
   const { data } = await supabase
     .from("artifacts")
     .select(
-      "id, owner_id, title, description, tags, preview_image_url, like_count, comment_count, view_count, status, created_at, profiles:owner_id (username, display_name, avatar_url)"
+      "id, owner_id, title, description, tags, preview_image_url, like_count, comment_count, view_count, status, created_at, profiles:owner_id (username, display_name, avatar_url, github_username)"
     )
     .eq("id", id)
     .eq("status", "published")
@@ -84,7 +85,7 @@ export default async function ArtifactPage({ params }: Props) {
     supabase
       .from("comments")
       .select(
-        "id, body, created_at, author_id, profiles:author_id (username, display_name, avatar_url)"
+        "id, body, created_at, author_id, profiles:author_id (username, display_name, avatar_url, github_username)"
       )
       .eq("artifact_id", artifact.id)
       .eq("status", "visible")
@@ -116,7 +117,7 @@ export default async function ArtifactPage({ params }: Props) {
             >
               <Avatar
                 name={creator.display_name}
-                imageUrl={creator.avatar_url}
+                imageUrl={resolveAvatarUrl(creator)}
                 size="sm"
               />
               <span className="text-sm font-medium">

@@ -5,7 +5,7 @@ import { FeedPost, type FeedArtifact } from "@/components/feed-post";
 export const metadata = { title: "Feed" };
 
 const FEED_SELECT =
-  "id, title, description, preview_image_url, like_count, comment_count, created_at, profiles:owner_id (username, display_name, avatar_url)";
+  "id, title, description, preview_image_url, like_count, comment_count, created_at, profiles:owner_id (username, display_name, avatar_url, bio, github_username)";
 const PAGE_SIZE = 30;
 
 type Props = { searchParams: Promise<{ tab?: string }> };

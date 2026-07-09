@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import { addComment, deleteComment } from "@/app/actions/social";
 import { Avatar } from "@/components/avatar";
+import { resolveAvatarUrl } from "@/lib/profile";
 import { ReportButton } from "@/components/report-button";
 
 export type CommentItem = {
@@ -15,6 +16,7 @@ export type CommentItem = {
     username: string;
     display_name: string;
     avatar_url: string | null;
+    github_username: string | null;
   } | null;
 };
 
@@ -90,7 +92,9 @@ export function CommentsSection({
           <li key={comment.id} className="flex gap-3">
             <Avatar
               name={comment.profiles?.display_name ?? "?"}
-              imageUrl={comment.profiles?.avatar_url}
+              imageUrl={
+                comment.profiles ? resolveAvatarUrl(comment.profiles) : null
+              }
               size="sm"
             />
             <div className="min-w-0 flex-1">

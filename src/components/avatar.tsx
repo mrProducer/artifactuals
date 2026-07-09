@@ -21,7 +21,8 @@ function hashString(s: string) {
 const SIZES = {
   sm: "size-8 text-xs",
   md: "size-10 text-sm",
-  lg: "size-20 text-2xl sm:size-24",
+  lg: "size-12 text-base",
+  xl: "size-20 text-2xl sm:size-24",
 } as const;
 
 export function Avatar({

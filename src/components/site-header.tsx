@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/avatar";
+import { resolveAvatarUrl } from "@/lib/profile";
 import { SignOutButton } from "@/components/sign-out-button";
 
 export async function SiteHeader() {
@@ -9,12 +10,16 @@ export async function SiteHeader() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let profile: { username: string; display_name: string; avatar_url: string | null } | null =
-    null;
+  let profile: {
+    username: string;
+    display_name: string;
+    avatar_url: string | null;
+    github_username: string | null;
+  } | null = null;
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("username, display_name, avatar_url")
+      .select("username, display_name, avatar_url, github_username")
       .eq("user_id", user.id)
       .maybeSingle();
     profile = data;
@@ -54,7 +59,7 @@ export async function SiteHeader() {
                 >
                   <Avatar
                     name={profile.display_name}
-                    imageUrl={profile.avatar_url}
+                    imageUrl={resolveAvatarUrl(profile)}
                     size="sm"
                   />
                   <span className="hidden font-medium sm:inline">

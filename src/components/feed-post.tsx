@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Avatar } from "@/components/avatar";
 import { FeedPostActions } from "@/components/feed-post-actions";
+import { resolveAvatarUrl } from "@/lib/profile";
 import { timeAgo } from "@/lib/time";
 
 export type FeedArtifact = {
@@ -15,6 +16,8 @@ export type FeedArtifact = {
     username: string;
     display_name: string;
     avatar_url: string | null;
+    bio: string | null;
+    github_username: string | null;
   } | null;
 };
 
@@ -31,29 +34,30 @@ export function FeedPost({
 
   return (
     <article className="border-y border-zinc-200 bg-white sm:border-x dark:border-zinc-800 dark:bg-zinc-900">
-      {/* Creator header */}
-      <div className="flex items-center gap-3 px-4 pt-3.5 pb-3">
+      {/* Creator header (LinkedIn-style: photo, name, headline, time) */}
+      <div className="flex items-start gap-3 px-4 pt-4 pb-3">
         {creator && (
           <>
             <Link href={`/${creator.username}`} className="shrink-0">
               <Avatar
                 name={creator.display_name}
-                imageUrl={creator.avatar_url}
-                size="md"
+                imageUrl={resolveAvatarUrl(creator)}
+                size="lg"
               />
             </Link>
-            <div className="min-w-0 flex-1 leading-tight">
+            <div className="min-w-0 flex-1">
               <Link
                 href={`/${creator.username}`}
-                className="block truncate text-sm font-semibold text-zinc-900 hover:underline dark:text-zinc-50"
+                className="block truncate text-sm font-semibold leading-5 text-zinc-900 hover:underline dark:text-zinc-50"
               >
                 {creator.display_name}
               </Link>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                @{creator.username}
-                {" · "}
+              <p className="truncate text-xs leading-4 text-zinc-500 dark:text-zinc-400">
+                {creator.bio ?? `@${creator.username}`}
+              </p>
+              <p className="text-xs leading-4 text-zinc-400 dark:text-zinc-500">
                 {timeAgo(artifact.created_at)}
-              </span>
+              </p>
             </div>
           </>
         )}

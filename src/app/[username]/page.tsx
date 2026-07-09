@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/avatar";
+import { resolveAvatarUrl } from "@/lib/profile";
 import { FollowButton } from "@/components/follow-button";
 import { fetchGitHubProfile } from "@/lib/github";
 
@@ -95,8 +96,12 @@ export default async function ProfilePage({ params }: Props) {
       <section className="flex flex-col gap-5 sm:flex-row sm:items-start">
         <Avatar
           name={profile.display_name}
-          imageUrl={profile.avatar_url ?? github?.profile.avatar_url}
-          size="lg"
+          imageUrl={
+            profile.avatar_url ??
+            github?.profile.avatar_url ??
+            resolveAvatarUrl(profile)
+          }
+          size="xl"
         />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
