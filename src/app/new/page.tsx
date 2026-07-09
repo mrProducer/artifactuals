@@ -4,6 +4,10 @@ import { ComposeForm } from "./compose-form";
 
 export const metadata = { title: "New artifact" };
 
+// Publishing awaits the hosted screenshot render (a few seconds) before
+// redirecting, so give the server action headroom beyond the default budget.
+export const maxDuration = 30;
+
 export default async function NewArtifactPage() {
   const supabase = await createClient();
   const {

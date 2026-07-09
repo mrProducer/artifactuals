@@ -29,18 +29,23 @@ npm run dev
 Open http://localhost:3000. Local auth uses email/password (no email
 confirmation); Google OAuth is added when the hosted project goes live.
 
-## Screenshot / OG-image worker
+## Screenshot / OG-image generation
 
-Generates 1200x630 preview images for published artifacts (feed cards and
-link previews), rendering through the same sandbox route the site uses:
+Every published artifact gets a 1200x630 preview image (feed cards and social
+link previews), rendered through the same sandbox route the site uses. Since
+headless Chromium can't run in Vercel's serverless runtime, the render is
+offloaded to a hosted browser API ([ScreenshotOne](https://screenshotone.com)).
 
-```bash
-npm run screenshots         # one-shot
-npm run screenshots:watch   # poll every 30s
-```
+Generation runs **synchronously at publish time** (`generateArtifactPreview` in
+[`src/lib/screenshot.ts`](src/lib/screenshot.ts)), before the user is handed a
+share link — this guarantees the real image exists the first time LinkedIn
+scrapes the page (LinkedIn caches the OG image aggressively, so a late image
+would never win). Owners can re-render at any time via **Regenerate preview** on
+their artifact page.
 
-Runs anywhere Node + Playwright run; in production this becomes a small
-container or cron job, not a serverless function.
+Set `SCREENSHOTONE_ACCESS_KEY` in production. If it's unset (e.g. local dev) or
+the origin isn't publicly reachable, the render is skipped and the per-artifact
+OG route serves a branded fallback card until an image exists.
 
 ## Database migrations
 

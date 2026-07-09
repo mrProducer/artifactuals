@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { generateArtifactPreview } from "@/lib/screenshot";
 import { ARTIFACT_TAGS } from "@/app/new/constants";
 
 type Result = { error?: string; success?: boolean };
@@ -96,6 +97,28 @@ export async function updateArtifactMeta(
   if (profile?.username) revalidatePath(`/${profile.username}`);
   revalidatePath(`/a/${artifactId}`);
   redirect(`/a/${artifactId}`);
+}
+
+export async function regenerateArtifactPreview(
+  artifactId: string
+): Promise<Result> {
+  const owned = await requireOwnedArtifact(artifactId);
+  if ("error" in owned) return owned;
+
+  const result = await generateArtifactPreview(artifactId);
+  if ("error" in result) {
+    return { error: "Could not regenerate the preview. Try again shortly." };
+  }
+
+  const { data: profile } = await owned.supabase
+    .from("profiles")
+    .select("username")
+    .eq("user_id", owned.user.id)
+    .maybeSingle();
+  if (profile?.username) revalidatePath(`/${profile.username}`);
+  revalidatePath(`/a/${artifactId}`);
+  revalidatePath("/feed");
+  return { success: true };
 }
 
 export async function deleteArtifact(artifactId: string): Promise<Result> {

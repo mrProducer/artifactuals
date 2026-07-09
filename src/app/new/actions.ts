@@ -1,12 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MAX_ARTIFACT_BYTES } from "@/lib/sandbox";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { triggerScreenshotWorker } from "@/lib/trigger-screenshots";
+import { generateArtifactPreview } from "@/lib/screenshot";
 import { ARTIFACT_TAGS, type PublishState } from "./constants";
 
 const UUID_RE =
@@ -142,9 +141,13 @@ export async function publishArtifact(
     return { error: "Could not publish. Please try again." };
   }
 
-  // Generate the preview screenshot now rather than waiting for the cron.
-  // Runs after the response is sent, so it never slows down publishing.
-  after(triggerScreenshotWorker);
+  // Render the share/preview screenshot now, before we hand the user a link
+  // to share. Blocking here (a few seconds) guarantees the real image is in
+  // place the first time LinkedIn scrapes the page — LinkedIn caches the OG
+  // image hard, so a late screenshot would otherwise never win. Best-effort:
+  // a render failure must never block publishing (the OG route falls back to a
+  // branded card until an image exists).
+  await generateArtifactPreview(artifact.id);
 
   redirect(`/a/${artifact.id}`);
 }

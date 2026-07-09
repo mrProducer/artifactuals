@@ -2,8 +2,12 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { PushPin, PencilSimple, Trash } from "@phosphor-icons/react";
-import { deleteArtifact, togglePin } from "@/app/actions/artifact-owner";
+import { PushPin, PencilSimple, Trash, Camera } from "@phosphor-icons/react";
+import {
+  deleteArtifact,
+  regenerateArtifactPreview,
+  togglePin,
+} from "@/app/actions/artifact-owner";
 import { buttonClass, Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 
@@ -31,6 +35,14 @@ export function ArtifactOwnerToolbar({
       if (result?.error) toast(result.error);
     });
 
+  const onRegenerate = () =>
+    startTransition(async () => {
+      toast("Regenerating preview...");
+      const result = await regenerateArtifactPreview(artifactId);
+      if (result.error) toast(result.error);
+      else toast("Preview updated.");
+    });
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Link
@@ -43,6 +55,16 @@ export function ArtifactOwnerToolbar({
       <Button variant="secondary" size="sm" disabled={pending} onClick={onPin}>
         <PushPin size={16} weight={isPinned ? "fill" : "bold"} />
         {isPinned ? "Unpin" : "Pin"}
+      </Button>
+      <Button
+        variant="secondary"
+        size="sm"
+        disabled={pending}
+        onClick={onRegenerate}
+        title="Re-render the share/preview image"
+      >
+        <Camera size={16} weight="bold" />
+        Regenerate preview
       </Button>
       {confirmingDelete ? (
         <span className="flex items-center gap-2">
