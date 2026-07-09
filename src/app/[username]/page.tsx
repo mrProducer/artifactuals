@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/avatar";
+import { ArtifactFrame } from "@/components/artifact-frame";
 import { resolveAvatarUrl } from "@/lib/profile";
 import { FollowButton } from "@/components/follow-button";
 import { fetchGitHubProfile } from "@/lib/github";
@@ -217,13 +218,19 @@ export default async function ProfilePage({ params }: Props) {
                 href={`/a/${artifact.id}`}
                 className="group overflow-hidden border border-zinc-200 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
               >
-                <div className="aspect-[1200/630] bg-zinc-100 dark:bg-zinc-900">
-                  {artifact.preview_image_url && (
+                <div className="aspect-[1200/630] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                  {artifact.preview_image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={artifact.preview_image_url}
                       alt={artifact.title}
                       className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <ArtifactFrame
+                      src={`/sandbox/a/${artifact.id}`}
+                      title={artifact.title}
+                      className="pointer-events-none h-full w-full border-0 bg-white"
                     />
                   )}
                 </div>

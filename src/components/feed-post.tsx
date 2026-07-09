@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Avatar } from "@/components/avatar";
+import { ArtifactFrame } from "@/components/artifact-frame";
 import { FeedPostActions } from "@/components/feed-post-actions";
 import { resolveAvatarUrl } from "@/lib/profile";
 import { timeAgo } from "@/lib/time";
@@ -77,11 +78,9 @@ export function FeedPost({
         </Link>
       </div>
 
-      {/* Media */}
-      <Link
-        href={`/a/${artifact.id}`}
-        className="block aspect-[1200/630] w-full overflow-hidden border-y border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950"
-      >
+      {/* Media: a generated screenshot once it exists, otherwise the live
+          artifact itself (non-interactive) so the feed is never empty. */}
+      <div className="relative aspect-[1200/630] w-full overflow-hidden border-y border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
         {artifact.preview_image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -91,11 +90,20 @@ export function FeedPost({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm text-zinc-400 dark:text-zinc-600">
-            Preview coming soon
-          </div>
+          <ArtifactFrame
+            src={`/sandbox/a/${artifact.id}`}
+            title={artifact.title}
+            className="pointer-events-none h-full w-full border-0 bg-white"
+          />
         )}
-      </Link>
+        {/* Transparent overlay makes the whole media open the artifact
+            (and keeps the live preview non-interactive). */}
+        <Link
+          href={`/a/${artifact.id}`}
+          aria-label={`Open ${artifact.title}`}
+          className="absolute inset-0"
+        />
+      </div>
 
       {/* Action bar */}
       <FeedPostActions
