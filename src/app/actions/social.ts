@@ -9,14 +9,27 @@ async function requireUser() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  return { supabase, user };
+
+  let banned = false;
+  if (user) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("banned_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    banned = Boolean(data?.banned_at);
+  }
+
+  return { supabase, user, banned };
 }
+
+const BANNED_MESSAGE = "Your account is suspended.";
 
 export async function toggleLike(
   artifactId: string,
   liked: boolean
 ): Promise<{ error?: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, banned } = await requireUser();
   if (!user) return { error: "Sign in to like artifacts." };
 
   if (liked) {
@@ -26,6 +39,7 @@ export async function toggleLike(
       .eq("user_id", user.id)
       .eq("artifact_id", artifactId);
   } else {
+    if (banned) return { error: BANNED_MESSAGE };
     const { error } = await supabase
       .from("likes")
       .insert({ user_id: user.id, artifact_id: artifactId });
@@ -43,7 +57,7 @@ export async function toggleFollow(
   following: boolean,
   username: string
 ): Promise<{ error?: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, banned } = await requireUser();
   if (!user) return { error: "Sign in to follow creators." };
   if (user.id === followeeId) return { error: "You can't follow yourself." };
 
@@ -54,6 +68,7 @@ export async function toggleFollow(
       .eq("follower_id", user.id)
       .eq("followee_id", followeeId);
   } else {
+    if (banned) return { error: BANNED_MESSAGE };
     const limitError = await checkRateLimit("follow", user.id);
     if (limitError) return { error: limitError };
 
@@ -73,8 +88,9 @@ export async function addComment(
   artifactId: string,
   body: string
 ): Promise<{ error?: string }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, banned } = await requireUser();
   if (!user) return { error: "Sign in to comment." };
+  if (banned) return { error: BANNED_MESSAGE };
 
   const trimmed = body.trim();
   if (trimmed.length < 1 || trimmed.length > 1000) {
@@ -113,8 +129,9 @@ export async function reportContent(
   targetId: string,
   reason: string
 ): Promise<{ error?: string; success?: boolean }> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, banned } = await requireUser();
   if (!user) return { error: "Sign in to report content." };
+  if (banned) return { error: BANNED_MESSAGE };
 
   const trimmed = reason.trim();
   if (trimmed.length < 1 || trimmed.length > 500) {

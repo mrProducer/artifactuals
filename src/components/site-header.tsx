@@ -18,15 +18,18 @@ export async function SiteHeader() {
     display_name: string;
     avatar_url: string | null;
     github_username: string | null;
+    role: string;
   } | null = null;
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("username, display_name, avatar_url, github_username")
+      .select("username, display_name, avatar_url, github_username, role")
       .eq("user_id", user.id)
       .maybeSingle();
     profile = data;
   }
+
+  const isModerator = profile?.role === "moderator" || profile?.role === "admin";
 
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-surface/85 shadow-sm backdrop-blur">
@@ -39,6 +42,7 @@ export async function SiteHeader() {
             </span>
           </Link>
           <NavLink href="/feed">Feed</NavLink>
+          {isModerator && <NavLink href="/admin">Admin</NavLink>}
         </div>
 
         <nav className="flex items-center gap-2">

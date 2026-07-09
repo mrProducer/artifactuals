@@ -73,6 +73,15 @@ export async function publishArtifact(
     redirect("/login");
   }
 
+  const { data: viewerProfile } = await supabase
+    .from("profiles")
+    .select("banned_at")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (viewerProfile?.banned_at) {
+    return { error: "Your account is suspended." };
+  }
+
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const html = String(formData.get("html") ?? "");

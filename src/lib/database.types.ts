@@ -207,9 +207,52 @@ export type Database = {
           },
         ]
       }
+      moderation_actions: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          moderator_id: string
+          note: string | null
+          report_id: string | null
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          moderator_id: string
+          note?: string | null
+          report_id?: string | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          moderator_id?: string
+          note?: string | null
+          report_id?: string | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_actions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          ban_reason: string | null
+          banned_at: string | null
           bio: string | null
           created_at: string
           custom_links: Json
@@ -217,12 +260,15 @@ export type Database = {
           github_username: string | null
           instagram_url: string | null
           linkedin_url: string | null
+          role: string
           updated_at: string
           user_id: string
           username: string
         }
         Insert: {
           avatar_url?: string | null
+          ban_reason?: string | null
+          banned_at?: string | null
           bio?: string | null
           created_at?: string
           custom_links?: Json
@@ -230,12 +276,15 @@ export type Database = {
           github_username?: string | null
           instagram_url?: string | null
           linkedin_url?: string | null
+          role?: string
           updated_at?: string
           user_id: string
           username: string
         }
         Update: {
           avatar_url?: string | null
+          ban_reason?: string | null
+          banned_at?: string | null
           bio?: string | null
           created_at?: string
           custom_links?: Json
@@ -243,6 +292,7 @@ export type Database = {
           github_username?: string | null
           instagram_url?: string | null
           linkedin_url?: string | null
+          role?: string
           updated_at?: string
           user_id?: string
           username?: string
@@ -288,6 +338,8 @@ export type Database = {
         Args: { p_artifact_id: string }
         Returns: undefined
       }
+      is_banned: { Args: { uid: string }; Returns: boolean }
+      is_moderator: { Args: { uid: string }; Returns: boolean }
       recompute_trending_scores: { Args: never; Returns: undefined }
     }
     Enums: {
