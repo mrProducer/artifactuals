@@ -75,6 +75,7 @@ export default async function Home() {
                     <ArtifactFrame
                       src={`/sandbox/a/${artifact.id}`}
                       title={artifact.title}
+                      scroll={false}
                       className="pointer-events-none h-full w-full border-0 bg-surface"
                     />
                   )}

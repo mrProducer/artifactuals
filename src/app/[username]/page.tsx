@@ -230,6 +230,7 @@ export default async function ProfilePage({ params }: Props) {
                     <ArtifactFrame
                       src={`/sandbox/a/${artifact.id}`}
                       title={artifact.title}
+                      scroll={false}
                       className="pointer-events-none h-full w-full border-0 bg-surface"
                     />
                   )}
