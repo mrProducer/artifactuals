@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polyrhythms — a field guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     Artifactuals — "The Quiet Gallery" design system.
+     Monochrome ink-on-paper. Sharp 0-radius plates. Hairline
+     borders. Mono for metadata. Color reserved for one semantic
+     cue: amber --highlight marks the beats that land / coincide.
+     ============================================================ */
+
+  /* ---- Base tokens (light) ---- */
+  :root{
+    --bg: oklch(0.985 0.003 95);
+    --surface: oklch(1 0 0);
+    --surface-muted: oklch(0.965 0.003 95);
+    --border: oklch(0.905 0.004 95);
+    --border-strong: oklch(0.82 0.004 95);
+    --fg: oklch(0.22 0.006 95);
+    --fg-muted: oklch(0.50 0.006 95);
+    --fg-subtle: oklch(0.63 0.006 95);
+    --accent: oklch(0.22 0.006 95);
+    --accent-hover: oklch(0.36 0.006 95);
+    --accent-fg: oklch(0.985 0.003 95);
+    --highlight: oklch(0.80 0.14 80);
+    --on-highlight: oklch(0.24 0.04 80);
+
+    --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.05), 0 1px 1px oklch(0 0 0 / 0.04);
+    --shadow-md: 0 6px 24px -8px oklch(0 0 0 / 0.14), 0 2px 6px -2px oklch(0 0 0 / 0.08);
+
+    --ease-out: cubic-bezier(0.2, 0, 0, 1);
+    --dur-micro: 120ms;
+    --dur-base: 200ms;
+    --dur-enter: 320ms;
+
+    --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  /* ---- Dark overrides ---- */
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: oklch(0.165 0.005 285);
+      --surface: oklch(0.205 0.005 285);
+      --surface-muted: oklch(0.245 0.005 285);
+      --border: oklch(0.29 0.006 285);
+      --border-strong: oklch(0.40 0.006 285);
+      --fg: oklch(0.95 0.004 285);
+      --fg-muted: oklch(0.72 0.005 285);
+      --fg-subtle: oklch(0.58 0.005 285);
+      --accent: oklch(0.95 0.004 285);
+      --accent-hover: oklch(0.82 0.005 285);
+      --accent-fg: oklch(0.165 0.005 285);
+      --highlight: oklch(0.82 0.13 80);
+      --on-highlight: oklch(0.22 0.04 80);
+    }
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+
+  a{
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+  }
+
+  /* Global focus ring — accessibility floor. */
+  :where(a, button, input, textarea, select, [tabindex]):focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .page{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding: 72px 0 40px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-text{ flex: 1 1 340px; }
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--fg-subtle);
+    margin: 0 0 18px;
+  }
+  .hero h1{
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: clamp(2.75rem, 7vw, 4.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin: 0 0 18px;
+  }
+  .hero p{
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--fg-muted);
+    max-width: 46ch;
+    margin: 0;
+  }
+  .hero-dial{ flex: 0 0 auto; width: 148px; height: 148px; }
+  .hero-dial svg{ width:100%; height:100%; display:block; }
+
+  /* ---------- Tabs ---------- */
+  .tabs{
+    display:flex;
+    gap: 0;
+    margin-top: 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn{
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    color: var(--fg-subtle);
+    padding: 14px 4px;
+    margin-right: 28px;
+    cursor: pointer;
+    position: relative;
+    top: 1px;
+    transition: color var(--dur-base) var(--ease-out);
+  }
+  .tab-btn:hover{ color: var(--fg); }
+  .tab-btn.active{ color: var(--fg); }
+  .tab-btn.active::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:-1px;
+    height:2px;
+    background: var(--accent);
+  }
+
+  .panel{ display:none; padding-top: 40px; }
+  .panel.active{ display:block; }
+  @media (prefers-reduced-motion: no-preference){
+    .panel.active{ animation: rise var(--dur-enter) var(--ease-out) both; }
+    @keyframes rise{
+      from{ opacity:0; transform: translateY(8px); }
+      to{ opacity:1; transform: none; }
+    }
+  }
+
+  .lede{
+    color: var(--fg-muted);
+    max-width: 68ch;
+    margin: 0 0 32px;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  /* ---------- Chip rows (sharp badges) ---------- */
+  .chip-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .chip{
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+    padding: 9px 14px;
+    border-radius: 0;
+    cursor:pointer;
+    transition: border-color var(--dur-base) var(--ease-out),
+                color var(--dur-base) var(--ease-out),
+                background var(--dur-base) var(--ease-out);
+  }
+  .chip:hover{ border-color: var(--border-strong); color: var(--fg); }
+  .chip.active{
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-fg);
+    font-weight: 600;
+  }
+  .chip.custom-chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .chip input[type=number]{
+    width: 34px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid currentColor;
+    color: inherit;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-align:center;
+    padding: 0 0 1px;
+  }
+  .chip input[type=number]:focus{ outline:none; }
+
+  /* ---------- Cards ---------- */
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: var(--shadow-sm);
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+
+  /* ---------- Meter beat rail ---------- */
+  .meter-label{
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 0 0 6px;
+  }
+  .meter-desc{
+    color: var(--fg-muted);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin: 0 0 16px;
+    max-width: 60ch;
+  }
+  .group-formula{
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--fg-subtle);
+    margin: 0 0 28px;
+  }
+  .beat-rail{
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    gap: 26px;
+    min-height: 120px;
+    padding: 10px 0 26px;
+    position: relative;
+  }
+  .beat-rail::before{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom: 22px;
+    height:1px;
+    background: var(--border);
+  }
+  .beat-group{ display:flex; gap: 14px; }
+  .dot{
+    border-radius:50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: transform var(--dur-micro) var(--ease-out),
+                background var(--dur-micro) var(--ease-out),
+                box-shadow var(--dur-micro) var(--ease-out);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-mono);
+    color: var(--fg-subtle);
+  }
+  .dot.weak{ width:26px; height:26px; font-size:10px; }
+  .dot.medium{ width:34px; height:34px; font-size:11px; border-color: var(--border-strong); color: var(--fg-muted); }
+  .dot.strong{ width:44px; height:44px; font-size:12px; border-color: var(--fg); color: var(--fg); font-weight:600; }
+  .dot.hit{
+    background: var(--highlight);
+    border-color: var(--highlight);
+    color: var(--on-highlight);
+    box-shadow: 0 0 0 5px oklch(0.80 0.14 80 / 0.16);
+  }
+
+  /* ---------- Transport ---------- */
+  .transport{
+    display:flex;
+    align-items:center;
+    gap: 22px;
+    flex-wrap: wrap;
+    padding-top: 24px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border);
+  }
+  .ic{ width: 14px; height: 14px; display:block; }
+  .play-btn{
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    display:flex; align-items:center; gap:10px;
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: 1px solid var(--accent);
+    padding: 12px 20px;
+    border-radius: 0;
+    cursor:pointer;
+    min-width: 128px;
+    min-height: 44px;
+    justify-content:center;
+    transition: background var(--dur-base) var(--ease-out),
+                transform var(--dur-micro) var(--ease-out);
+  }
+  .play-btn:hover{ background: var(--accent-hover); border-color: var(--accent-hover); }
+  .play-btn:active{ transform: translateY(1px); }
+  .play-btn.playing{
+    background: var(--surface);
+    color: var(--fg);
+    border:1px solid var(--border-strong);
+  }
+  .play-btn.playing:hover{ background: var(--surface-muted); }
+  .tempo{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--fg-muted);
+    flex: 1 1 200px;
+  }
+  .tempo input[type=range]{
+    flex:1;
+    accent-color: var(--accent);
+  }
+  .tempo .val{ color: var(--fg); min-width: 96px; text-align:right; }
+  .volume{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    flex: 0 1 160px;
+  }
+  .volume input[type=range]{
+    flex:1;
+    accent-color: var(--accent);
+  }
+  .vol-icon{
+    background:var(--surface);
+    border:1px solid var(--border);
+    color: var(--fg-muted);
+    width:44px; height:44px;
+    border-radius:0;
+    cursor:pointer;
+    flex: 0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    transition: border-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+  }
+  .vol-icon:hover{ border-color: var(--border-strong); color: var(--fg); }
+  .vol-icon .ic{ width:16px; height:16px; }
+
+  /* ---------- Polyrhythm dial ---------- */
+  .poly-layout{
+    display:flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    align-items:center;
+  }
+  .dial-wrap{ flex: 0 0 auto; width: 260px; }
+  .dial-wrap svg{ width:100%; height:auto; display:block; }
+  .ring-a{ fill:none; stroke: var(--border-strong); stroke-width:1; }
+  .ring-b{ fill:none; stroke: var(--border); stroke-width:1; }
+  .arm{ stroke-width: 2.5; stroke-linecap: round; }
+  .arm-a{ stroke: var(--fg); }
+  .arm-b{ stroke: var(--fg-muted); stroke-width: 2; stroke-dasharray: 3 4; }
+  .tip{ transition: r var(--dur-micro) var(--ease-out), fill var(--dur-micro) var(--ease-out); }
+  .tip-a{ fill: var(--fg); }
+  .tip-b{ fill: var(--surface); stroke: var(--fg); stroke-width: 1.5; }
+  .tip.hit{ r:10; fill: var(--highlight); stroke: var(--highlight); }
+  .tick-dot{ fill: var(--border-strong); transition: fill var(--dur-micro) var(--ease-out), r var(--dur-micro) var(--ease-out); }
+  .tick-dot.tickA{ fill: var(--fg-subtle); }
+  .tick-dot.tickB{ fill: var(--fg-subtle); }
+  .tick-dot.hit{ fill: var(--highlight); r:5.5; }
+  .hub-label{
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 600;
+    fill: var(--fg);
+    text-anchor: middle;
+  }
+  .hub-sub{
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--fg-subtle);
+    text-anchor: middle;
+    letter-spacing: .09em;
+  }
+
+  .dial-readout{
+    flex: 1 1 240px;
+    min-width: 220px;
+  }
+  .legend{ display:flex; gap:20px; margin-bottom: 18px; flex-wrap:wrap; }
+  .legend-item{ display:flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:0.75rem; color: var(--fg-muted); }
+  .swatch{ width:11px; height:11px; border-radius:0; }
+  .swatch.a{ background: var(--fg); }
+  .swatch.b{ background: var(--surface); border: 1.5px solid var(--fg); }
+  .counter{
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--fg-muted);
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    padding: 12px 14px;
+    margin-bottom: 4px;
+    transition: border-color var(--dur-base) var(--ease-out);
+  }
+  .counter b{ color: var(--fg); font-weight:600; }
+  .counter.aligned{ border-color: var(--highlight); }
+
+  .explainer{
+    color: var(--fg-muted);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin: 22px 0 0;
+    max-width: 62ch;
+  }
+  .explainer strong{ color: var(--fg); font-weight:600; }
+
+  /* ---------- Ruler ---------- */
+  .ruler-wrap{ margin-top: 28px; overflow-x:auto; padding-bottom: 6px; }
+  .ruler{
+    position:relative;
+    display:flex;
+    height: 46px;
+    min-width: 100%;
+    border-radius: 0;
+    overflow:hidden;
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+  }
+  .cell{
+    flex:1;
+    position:relative;
+    border-right: 1px solid var(--border);
+    min-width: 6px;
+  }
+  .cell:last-child{ border-right: none; }
+  .cell .mA, .cell .mB{
+    position:absolute; left:0; right:0; height:40%;
+  }
+  .cell .mA{ top:0; background: var(--fg); opacity:0; }
+  .cell .mB{ bottom:0; background: var(--fg-muted); opacity:0; }
+  .cell.hasA .mA{ opacity:1; }
+  .cell.hasB .mB{ opacity:1; }
+  .cell.common{ background: oklch(0.80 0.14 80 / 0.20); }
+  .cell.common .mA, .cell.common .mB{ background: var(--highlight); opacity:1; }
+  .playhead{
+    position:absolute;
+    top:-1px; bottom:-1px;
+    width:2px;
+    background: var(--fg);
+    left:0;
+  }
+  .ruler-labels{
+    display:flex;
+    justify-content:space-between;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--fg-subtle);
+    margin-top:8px;
+  }
+
+  footer{
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--fg-subtle);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
+  }
+
+  @media (max-width: 620px){
+    .hero{ padding-top: 48px; }
+    .poly-layout{ flex-direction:column; align-items:stretch; }
+    .dial-wrap{ width: 220px; margin: 0 auto; }
+    .beat-rail{ gap: 14px; }
+    .beat-group{ gap: 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-text">
+      <p class="eyebrow">A field guide</p>
+      <h1>Polyrhythms</h1>
+      <p>What happens when two different rhythms share the same bar — set against each other, they never quite line up, except where they must.</p>
+    </div>
+    <div class="hero-dial" aria-hidden="true">
+      <svg viewBox="0 0 300 300">
+        <circle class="ring-a" cx="150" cy="150" r="130"></circle>
+        <circle class="ring-b" cx="150" cy="150" r="92"></circle>
+        <g id="heroTicks"></g>
+        <g id="heroArms">
+          <line class="arm arm-a" x1="150" y1="150" x2="150" y2="20"></line>
+          <line class="arm arm-b" x1="150" y1="150" x2="150" y2="58"></line>
+          <circle class="tip tip-a" cx="150" cy="20" r="6"></circle>
+          <circle class="tip tip-b" cx="150" cy="58" r="6"></circle>
+        </g>
+        <circle cx="150" cy="150" r="3" fill="var(--fg-subtle)"></circle>
+      </svg>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="meters">Time Signatures</button>
+    <button class="tab-btn" data-tab="poly">Polyrhythms</button>
+  </nav>
+
+  <!-- ===================== METERS PANEL ===================== -->
+  <section class="panel active" id="panel-meters">
+    <p class="lede">Start with a single rhythm. Every meter groups its beats differently, and that grouping is what gives each one its personality. The rule is always the same: the first beat of every group gets the accent — so once you can see the grouping, the accents stop feeling random. Pick one, hit play, and listen for where they fall.</p>
+
+    <div class="chip-row" id="meterChips"></div>
+
+    <div class="card">
+      <h2 class="meter-label" id="meterLabel">4/4</h2>
+      <p class="meter-desc" id="meterDesc"></p>
+      <p class="group-formula" id="groupFormula"></p>
+      <div class="beat-rail" id="beatRail"></div>
+
+      <div class="transport">
+        <button class="play-btn" id="meterPlay"></button>
+        <div class="tempo">
+          <span>Tempo</span>
+          <input type="range" id="meterTempo" min="60" max="200" value="120" step="1">
+          <span class="val" id="meterTempoVal">120 BPM</span>
+        </div>
+        <div class="volume">
+          <button class="vol-icon" id="meterVolIcon" title="Mute" aria-label="Mute"></button>
+          <input type="range" id="meterVolume" min="0" max="100" value="75" step="1" aria-label="Volume">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== POLYRHYTHM PANEL ===================== -->
+  <section class="panel" id="panel-poly">
+    <p class="lede">Now play two of those groupings at once. A "5:4 polyrhythm" means 5 evenly-spaced beats and 4 evenly-spaced beats sharing the exact same span of time — so one pattern is audibly busier than the other, and they only shake hands at the start and end of the bar.</p>
+
+    <div class="chip-row" id="polyChips"></div>
+
+    <div class="card">
+      <div class="poly-layout">
+        <div class="dial-wrap">
+          <svg viewBox="0 0 300 300">
+            <circle class="ring-a" cx="150" cy="150" r="130"></circle>
+            <circle class="ring-b" cx="150" cy="150" r="92"></circle>
+            <g id="dialTicks"></g>
+            <g id="dialArms">
+              <line class="arm arm-a" x1="150" y1="150" x2="150" y2="20"></line>
+              <line class="arm arm-b" x1="150" y1="150" x2="150" y2="58"></line>
+              <circle class="tip tip-a" id="tipA" cx="150" cy="20" r="7"></circle>
+              <circle class="tip tip-b" id="tipB" cx="150" cy="58" r="7"></circle>
+            </g>
+            <circle cx="150" cy="150" r="2.5" fill="var(--fg-subtle)"></circle>
+            <text class="hub-label" id="hubLabel" x="150" y="180">5 : 4</text>
+            <text class="hub-sub" x="150" y="195">RATIO</text>
+          </svg>
+        </div>
+        <div class="dial-readout">
+          <div class="legend">
+            <div class="legend-item"><span class="swatch a"></span><span id="legendA">Pattern A — 5 beats</span></div>
+            <div class="legend-item"><span class="swatch b"></span><span id="legendB">Pattern B — 4 beats</span></div>
+          </div>
+          <div class="counter" id="counter">bar <b id="barNum">1</b> · tick <b id="tickNum">1</b> of <b id="tickTotal">20</b></div>
+          <p class="explainer" id="polyExplainer"></p>
+        </div>
+      </div>
+
+      <div class="ruler-wrap">
+        <div class="ruler" id="ruler"></div>
+        <div class="ruler-labels"><span>tick 0 (start)</span><span id="rulerEnd">tick 20 (repeat)</span></div>
+      </div>
+
+      <div class="transport">
+        <button class="play-btn" id="polyPlay"></button>
+        <div class="tempo">
+          <span>Tempo</span>
+          <input type="range" id="polyTempo" min="20" max="100" value="45" step="1">
+          <span class="val" id="polyTempoVal">45 cycles/min</span>
+        </div>
+        <div class="volume">
+          <button class="vol-icon" id="polyVolIcon" title="Mute" aria-label="Mute"></button>
+          <input type="range" id="polyVolume" min="0" max="100" value="75" step="1" aria-label="Volume">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>All sound is synthesized in your browser with the Web Audio API — nothing to download, nothing recorded.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ monochrome SVG iconography (no emoji) ============ */
+  var ICON = {
+    play: '<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3.2v9.6l8-4.8z" fill="currentColor"/></svg>',
+    stop: '<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" fill="currentColor"/></svg>',
+    volHigh: '<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6h2.5L8 3v10L4.5 10H2z" fill="currentColor"/><path d="M10.4 5.2a4 4 0 0 1 0 5.6M12.4 3.6a6.5 6.5 0 0 1 0 8.8" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    volLow: '<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6h2.5L8 3v10L4.5 10H2z" fill="currentColor"/><path d="M10.4 5.2a4 4 0 0 1 0 5.6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    volMute: '<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6h2.5L8 3v10L4.5 10H2z" fill="currentColor"/><path d="M10.5 6l4 4M14.5 6l-4 4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
+  };
+  var PLAY_HTML = ICON.play + '<span>Play</span>';
+  var STOP_HTML = ICON.stop + '<span>Stop</span>';
+
+  /* ============ shared audio engine ============ */
+  var audioCtx = null;
+  var masterGain = null;
+  var masterVolume = 0.75; // 0..1, controlled by the volume sliders
+
+  function ensureAudio(){
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = masterVolume;
+      masterGain.connect(audioCtx.destination);
+    }
+    if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+    return audioCtx;
+  }
+
+  function click(time, freq, opts){
+    opts = opts || {};
+    var gainVal = opts.gain != null ? opts.gain : 0.18;
+    var decay = opts.decay != null ? opts.decay : 0.09;
+    var type = opts.type || 'sine';
+    var ctx = audioCtx;
+    var osc = ctx.createOscillator();
+    var amp = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, time);
+    amp.gain.setValueAtTime(0.0001, time);
+    amp.gain.linearRampToValueAtTime(gainVal, time + 0.003);
+    amp.gain.exponentialRampToValueAtTime(0.0001, time + decay);
+    osc.connect(amp).connect(masterGain);
+    osc.start(time);
+    osc.stop(time + decay + 0.03);
+  }
+
+  /* ============ single shared volume control (mirrored on both tabs) ============ */
+  var volumeInputs = [];
+  var volIcons = [];
+  var lastNonZeroVolume = 75;
+  function volIconFor(v){ return v === 0 ? ICON.volMute : (v < 40 ? ICON.volLow : ICON.volHigh); }
+  function setVolume(v){
+    v = Math.max(0, Math.min(100, v));
+    masterVolume = v / 100;
+    volumeInputs.forEach(function(inp){ inp.value = v; });
+    volIcons.forEach(function(btn){ btn.innerHTML = volIconFor(v); });
+    if(masterGain){ masterGain.gain.setTargetAtTime(masterVolume, audioCtx.currentTime, 0.01); }
+    if(v > 0){ lastNonZeroVolume = v; }
+  }
+
+  /* generic isochronous pulse generator: fires onHit(k, absoluteTime) forever */
+  function PulseLayer(startTime, interval, onHit){
+    this.startTime = startTime;
+    this.interval = interval;
+    this.onHit = onHit;
+    this.k = 0;
+  }
+  PulseLayer.prototype.scheduleUpTo = function(t){
+    while(this.startTime + this.k * this.interval < t){
+      var time = this.startTime + this.k * this.interval;
+      this.onHit(this.k, time);
+      this.k++;
+    }
+  };
+
+  var activeLayers = [];
+  var schedTimer = null;
+  var LOOKAHEAD = 0.12;
+  function schedulerTick(){
+    var t = audioCtx.currentTime + LOOKAHEAD;
+    for(var i=0;i<activeLayers.length;i++){ activeLayers[i].scheduleUpTo(t); }
+    schedTimer = setTimeout(schedulerTick, 25);
+  }
+  function startScheduler(){ if(!schedTimer){ schedulerTick(); } }
+  function stopScheduler(){ if(schedTimer){ clearTimeout(schedTimer); schedTimer=null; } }
+
+  function gcd(a,b){ return b ? gcd(b, a % b) : a; }
+  function lcm(a,b){ return (a / gcd(a,b)) * b; }
+
+  /* ============ tab switching ============ */
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  var panels = { meters: document.getElementById('panel-meters'), poly: document.getElementById('panel-poly') };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      stopMeter(); stopPoly();
+      tabBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      Object.keys(panels).forEach(function(k){ panels[k].classList.remove('active'); });
+      panels[btn.dataset.tab].classList.add('active');
+    });
+  });
+
+  volumeInputs = [document.getElementById('meterVolume'), document.getElementById('polyVolume')];
+  volIcons = [document.getElementById('meterVolIcon'), document.getElementById('polyVolIcon')];
+  volumeInputs.forEach(function(inp){
+    inp.addEventListener('input', function(){ setVolume(parseInt(inp.value, 10)); });
+  });
+  volIcons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      setVolume(masterVolume > 0 ? 0 : lastNonZeroVolume);
+    });
+  });
+  setVolume(75);
+
+  /* ============================================================ */
+  /* ======================  METERS TAB  ========================= */
+  /* ============================================================ */
+
+  var METERS = {
+    '4/4': { count:4, groups:[2,2], unit:1,
+      desc:'Four steady beats, felt as two halves — the backbone of pop, rock, and most dance music. Beat 1 lands hardest; beat 3 gets a lighter lift because it opens the second half.' },
+    '3/4': { count:3, groups:[3], unit:1,
+      desc:'Three beats, one group, a graceful ONE-two-three. Waltzes and minuets live here.' },
+    '6/8': { count:6, groups:[3,3], unit:0.5,
+      desc:'Six eighth-notes, felt as two big beats of three: ONE-two-three-FOUR-five-six. Common in jigs, ballads, and marches.' },
+    '7/8': { count:7, groups:[2,2,3], unit:0.5,
+      desc:'Seven beats that don\'t split evenly, so they\'re grouped 2+2+3 — ONE-two, ONE-two, ONE-two-three. The uneven groups give it a limping, off-kilter drive.' },
+    '5/4': { count:5, groups:[3,2], unit:1,
+      desc:'Five beats grouped 3+2 — think "Take Five" or the Mission: Impossible theme. It never quite resolves the way 4/4 does.' }
+  };
+
+  /* Accent rule, applied the same way to every meter: the very first beat
+     is the strongest accent, and the first beat of every later group gets
+     a secondary accent. Everything else is unaccented. This is why, say,
+     7/8 grouped 2+2+3 accents beats 1, 3 and 5 — those are the group starts. */
+  function computeAccents(groups){
+    var starts = [];
+    var idx = 0;
+    groups.forEach(function(g){ starts.push(idx); idx += g; });
+    var accents = [];
+    for(var i=0; i<idx; i++){
+      accents.push(i === 0 ? 2 : (starts.indexOf(i) !== -1 ? 1 : 0));
+    }
+    return accents;
+  }
+  var meterOrder = ['4/4','3/4','6/8','7/8','5/4'];
+  var currentMeter = '4/4';
+  var meterPlaying = false;
+  var meterState = null; // {startTime, interval, count}
+  var meterPPM = 120;
+
+  var meterChipsEl = document.getElementById('meterChips');
+  meterOrder.forEach(function(key){
+    var chip = document.createElement('button');
+    chip.className = 'chip' + (key === currentMeter ? ' active' : '');
+    chip.textContent = key;
+    chip.addEventListener('click', function(){ selectMeter(key); });
+    chip.dataset.key = key;
+    meterChipsEl.appendChild(chip);
+  });
+
+  var beatRailEl = document.getElementById('beatRail');
+  var meterLabelEl = document.getElementById('meterLabel');
+  var meterDescEl = document.getElementById('meterDesc');
+  var groupFormulaEl = document.getElementById('groupFormula');
+
+  function accentClass(a){ return a === 2 ? 'strong' : (a === 1 ? 'medium' : 'weak'); }
+
+  function renderMeter(){
+    var m = METERS[currentMeter];
+    var accents = computeAccents(m.groups);
+    meterLabelEl.textContent = currentMeter;
+    meterDescEl.textContent = m.desc;
+
+    var accentBeats = [];
+    accents.forEach(function(a, i){ if(a > 0) accentBeats.push(i + 1); });
+    groupFormulaEl.textContent = 'Grouped ' + m.groups.join(' + ')
+      + '  ·  accent on beat' + (accentBeats.length > 1 ? 's' : '') + ' ' + accentBeats.join(', ');
+
+    beatRailEl.innerHTML = '';
+    var idx = 0;
+    m.groups.forEach(function(gsize){
+      var group = document.createElement('div');
+      group.className = 'beat-group';
+      for(var i=0;i<gsize;i++){
+        (function(beatIndex){
+          var dot = document.createElement('div');
+          dot.className = 'dot ' + accentClass(accents[beatIndex]);
+          dot.textContent = beatIndex + 1;
+          dot.dataset.index = beatIndex;
+          group.appendChild(dot);
+        })(idx);
+        idx++;
+      }
+      beatRailEl.appendChild(group);
+    });
+  }
+
+  function selectMeter(key){
+    currentMeter = key;
+    Array.prototype.forEach.call(meterChipsEl.children, function(c){
+      c.classList.toggle('active', c.dataset.key === key);
+    });
+    renderMeter();
+    if(meterPlaying){ startMeter(); } // restart cleanly on new pattern
+  }
+
+  var meterTempoInput = document.getElementById('meterTempo');
+  var meterTempoVal = document.getElementById('meterTempoVal');
+  meterTempoInput.addEventListener('input', function(){
+    meterPPM = parseInt(meterTempoInput.value, 10);
+    meterTempoVal.textContent = meterPPM + ' BPM';
+    if(meterPlaying){ startMeter(); }
+  });
+
+  var meterPlayBtn = document.getElementById('meterPlay');
+  meterPlayBtn.innerHTML = PLAY_HTML;
+
+  function startMeter(){
+    ensureAudio();
+    stopPoly();
+    stopScheduler();
+    var ctx = audioCtx;
+    var start = ctx.currentTime + 0.08;
+    var m = METERS[currentMeter];
+    var interval = (60 / meterPPM) * m.unit;
+    var accents = computeAccents(m.groups);
+    meterState = { startTime: start, interval: interval, count: m.count, lastHit: -1 };
+    var layer = new PulseLayer(start, interval, function(k, t){
+      var accent = accents[k % m.count];
+      var freq = accent === 2 ? 880 : (accent === 1 ? 600 : 420);
+      var gain = accent === 2 ? 0.24 : (accent === 1 ? 0.17 : 0.11);
+      var type = accent === 2 ? 'square' : 'sine';
+      click(t, freq, { gain: gain, decay: 0.09, type: type });
+    });
+    activeLayers = [layer];
+    startScheduler();
+    meterPlaying = true;
+    meterPlayBtn.classList.add('playing');
+    meterPlayBtn.innerHTML = STOP_HTML;
+    requestAnimationFrame(drawMeterLoop);
+  }
+
+  function stopMeter(){
+    if(!meterPlaying) return;
+    meterPlaying = false;
+    activeLayers = [];
+    stopScheduler();
+    meterPlayBtn.classList.remove('playing');
+    meterPlayBtn.innerHTML = PLAY_HTML;
+    Array.prototype.forEach.call(beatRailEl.children, function(g){
+      Array.prototype.forEach.call(g.children, function(d){ d.classList.remove('hit'); });
+    });
+  }
+
+  meterPlayBtn.addEventListener('click', function(){
+    if(meterPlaying){ stopMeter(); } else { startMeter(); }
+  });
+
+  function drawMeterLoop(){
+    if(!meterPlaying) return;
+    var now = audioCtx.currentTime;
+    var elapsed = now - meterState.startTime;
+    if(elapsed >= 0){
+      var pulseFloat = elapsed / meterState.interval;
+      var idx = Math.floor(pulseFloat) % meterState.count;
+      if(idx !== meterState.lastHit){
+        var dots = [];
+        Array.prototype.forEach.call(beatRailEl.children, function(g){
+          Array.prototype.forEach.call(g.children, function(d){ dots.push(d); });
+        });
+        dots.forEach(function(d){ d.classList.remove('hit'); });
+        if(dots[idx]) dots[idx].classList.add('hit');
+        meterState.lastHit = idx;
+      }
+    }
+    requestAnimationFrame(drawMeterLoop);
+  }
+
+  renderMeter();
+
+  /* ============================================================ */
+  /* =====================  POLYRHYTHM TAB  ======================= */
+  /* ============================================================ */
+
+  var poly = { a:5, b:4 };
+  var polyPlaying = false;
+  var polyState = null;
+  var polyCPM = 45;
+  var presets = [[3,2],[4,3],[5,4],[5,3],[7,4],[3,4],[2,3],[7,8]];
+
+  var polyChipsEl = document.getElementById('polyChips');
+  presets.forEach(function(p){
+    var chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.textContent = p[0] + ' : ' + p[1];
+    chip.dataset.a = p[0]; chip.dataset.b = p[1];
+    chip.addEventListener('click', function(){ setPoly(p[0], p[1]); });
+    polyChipsEl.appendChild(chip);
+  });
+  var customChip = document.createElement('div');
+  customChip.className = 'chip custom-chip';
+  customChip.innerHTML = 'Custom&nbsp;'
+    + '<input type="number" id="customA" min="2" max="9" value="5">'
+    + '<span>:</span>'
+    + '<input type="number" id="customB" min="2" max="9" value="4">';
+  polyChipsEl.appendChild(customChip);
+  var customA = customChip.querySelector('#customA');
+  var customB = customChip.querySelector('#customB');
+  function clampCustom(v){ v = parseInt(v,10); if(isNaN(v)) v=2; return Math.max(2, Math.min(9, v)); }
+  [customA, customB].forEach(function(inp){
+    inp.addEventListener('change', function(){
+      inp.value = clampCustom(inp.value);
+      setPoly(parseInt(customA.value,10), parseInt(customB.value,10), true);
+    });
+    inp.addEventListener('click', function(e){ e.stopPropagation(); });
+  });
+  customChip.addEventListener('click', function(){
+    setPoly(parseInt(customA.value,10), parseInt(customB.value,10), true);
+  });
+
+  var legendA = document.getElementById('legendA');
+  var legendB = document.getElementById('legendB');
+  var hubLabel = document.getElementById('hubLabel');
+  var polyExplainer = document.getElementById('polyExplainer');
+  var barNumEl = document.getElementById('barNum');
+  var tickNumEl = document.getElementById('tickNum');
+  var tickTotalEl = document.getElementById('tickTotal');
+  var counterEl = document.getElementById('counter');
+  var rulerEl = document.getElementById('ruler');
+  var rulerEndEl = document.getElementById('rulerEnd');
+
+  var dialTicksEl = document.getElementById('dialTicks');
+  var dialArmsEl = document.getElementById('dialArms');
+  var tipA = document.getElementById('tipA');
+  var tipB = document.getElementById('tipB');
+
+  function polarPoint(cx, cy, r, angleDeg){
+    var rad = (angleDeg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+
+  function buildTicks(a, b){
+    var html = '';
+    for(var i=0;i<a;i++){
+      var p = polarPoint(150,150,130, i * 360 / a);
+      html += '<circle class="tick-dot tickA" data-layer="A" data-k="'+i+'" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5"></circle>';
+    }
+    for(var j=0;j<b;j++){
+      var q = polarPoint(150,150,92, j * 360 / b);
+      html += '<circle class="tick-dot tickB" data-layer="B" data-k="'+j+'" cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="3.5"></circle>';
+    }
+    dialTicksEl.innerHTML = html;
+  }
+
+  function buildRuler(a, b){
+    var L = lcm(a,b);
+    var setA = {}, setB = {};
+    for(var i=0;i<a;i++){ setA[Math.round(i*L/a)] = true; }
+    for(var j=0;j<b;j++){ setB[Math.round(j*L/b)] = true; }
+    var html = '';
+    for(var t=0;t<L;t++){
+      var hasA = !!setA[t], hasB = !!setB[t], common = hasA && hasB;
+      var cls = 'cell' + (hasA?' hasA':'') + (hasB?' hasB':'') + (common?' common':'');
+      html += '<div class="'+cls+'"><div class="mA"></div><div class="mB"></div></div>';
+    }
+    rulerEl.innerHTML = html + '<div class="playhead" id="playhead"></div>';
+    rulerEndEl.textContent = 'tick ' + L + ' (repeat)';
+    return L;
+  }
+
+  function setPoly(a, b, fromCustom){
+    a = Math.max(2, Math.min(9, a));
+    b = Math.max(2, Math.min(9, b));
+    poly.a = a; poly.b = b;
+    Array.prototype.forEach.call(polyChipsEl.children, function(c){
+      if(c === customChip){
+        c.classList.toggle('active', !!fromCustom);
+      } else {
+        c.classList.toggle('active', !fromCustom && parseInt(c.dataset.a,10) === a && parseInt(c.dataset.b,10) === b);
+      }
+    });
+    if(!fromCustom){ customA.value = a; customB.value = b; }
+
+    var L = lcm(a,b);
+    var g = gcd(a,b);
+    legendA.textContent = 'Pattern A — ' + a + ' beats';
+    legendB.textContent = 'Pattern B — ' + b + ' beats';
+    hubLabel.textContent = a + ' : ' + b;
+    tickTotalEl.textContent = L;
+
+    var explain = 'In the time it takes to fit <strong>' + b + '</strong> evenly-spaced beats, you\'re also fitting <strong>' + a
+      + '</strong> evenly-spaced beats — that\'s a <strong>' + a + ':' + b + ' polyrhythm</strong>. '
+      + 'To notate both on one grid you need <strong>' + L + '</strong> equal slices (the LCM of ' + a + ' and ' + b + '). '
+      + 'Pattern A lands every ' + (L/a) + ' slices, pattern B every ' + (L/b) + ' slices.';
+    if(a === b){
+      explain += ' Since both numbers are the same, every beat lines up — there\'s no polyrhythm here, just one rhythm doubled.';
+    } else if(g > 1){
+      explain += ' Because ' + a + ' and ' + b + ' share a common factor (' + g + '), they actually shake hands ' + g + ' times per bar, not just at the start.';
+    } else {
+      explain += ' Since ' + a + ' and ' + b + ' share no common factor, the only place they land together is slice 0 — the very start and end of the bar.';
+    }
+    polyExplainer.innerHTML = explain;
+
+    buildTicks(a, b);
+    buildRuler(a, b);
+
+    if(polyPlaying){ startPoly(); }
+  }
+
+  var polyTempoInput = document.getElementById('polyTempo');
+  var polyTempoVal = document.getElementById('polyTempoVal');
+  polyTempoInput.addEventListener('input', function(){
+    polyCPM = parseInt(polyTempoInput.value, 10);
+    polyTempoVal.textContent = polyCPM + ' cycles/min';
+    if(polyPlaying){ startPoly(); }
+  });
+
+  var polyPlayBtn = document.getElementById('polyPlay');
+  polyPlayBtn.innerHTML = PLAY_HTML;
+
+  function startPoly(){
+    ensureAudio();
+    stopMeter();
+    stopScheduler();
+    var ctx = audioCtx;
+    var T = 60 / polyCPM;
+    var start = ctx.currentTime + 0.08;
+    polyState = { startTime:start, T:T, a:poly.a, b:poly.b, lastHitA:null, lastHitB:null, lastBar:-1 };
+    var layerA = new PulseLayer(start, T / poly.a, function(k, t){
+      polyState.lastHitA = { t:t, k: k % poly.a };
+      click(t, 720, { gain:0.20, decay:0.085, type:'square' });
+    });
+    var layerB = new PulseLayer(start, T / poly.b, function(k, t){
+      polyState.lastHitB = { t:t, k: k % poly.b };
+      click(t, 300, { gain:0.22, decay:0.16, type:'sine' });
+    });
+    activeLayers = [layerA, layerB];
+    startScheduler();
+    polyPlaying = true;
+    polyPlayBtn.classList.add('playing');
+    polyPlayBtn.innerHTML = STOP_HTML;
+    requestAnimationFrame(drawPolyLoop);
+  }
+
+  function stopPoly(){
+    if(!polyPlaying) return;
+    polyPlaying = false;
+    activeLayers = [];
+    stopScheduler();
+    polyPlayBtn.classList.remove('playing');
+    polyPlayBtn.innerHTML = PLAY_HTML;
+    dialArmsEl.setAttribute('transform','rotate(0,150,150)');
+    counterEl.classList.remove('aligned');
+    var ph = document.getElementById('playhead');
+    if(ph) ph.style.left = '0%';
+  }
+
+  polyPlayBtn.addEventListener('click', function(){
+    if(polyPlaying){ stopPoly(); } else { startPoly(); }
+  });
+
+  var FLASH = 0.15;
+  function drawPolyLoop(){
+    if(!polyPlaying) return;
+    var now = audioCtx.currentTime;
+    var elapsed = now - polyState.startTime;
+    if(elapsed >= 0){
+      var barPhase = (elapsed / polyState.T) % 1;
+      var angle = barPhase * 360;
+      dialArmsEl.setAttribute('transform', 'rotate(' + angle.toFixed(2) + ',150,150)');
+
+      var L = lcm(poly.a, poly.b);
+      var tickFloat = barPhase * L;
+      tickNumEl.textContent = Math.min(L, Math.floor(tickFloat) + 1);
+
+      var barCount = Math.floor(elapsed / polyState.T);
+      barNumEl.textContent = barCount + 1;
+      if(barCount !== polyState.lastBar){
+        polyState.lastBar = barCount;
+        counterEl.classList.add('aligned');
+        setTimeout(function(){ counterEl.classList.remove('aligned'); }, 260);
+      }
+
+      var ph = document.getElementById('playhead');
+      if(ph){ ph.style.left = (barPhase * 100).toFixed(2) + '%'; }
+
+      updateHitVisual('A', tipA, now);
+      updateHitVisual('B', tipB, now);
+    }
+    requestAnimationFrame(drawPolyLoop);
+  }
+
+  function updateHitVisual(layerName, tipEl, now){
+    var hit = layerName === 'A' ? polyState.lastHitA : polyState.lastHitB;
+    if(!hit) return;
+    var dt = now - hit.t;
+    var active = dt >= 0 && dt < FLASH;
+    tipEl.classList.toggle('hit', active);
+    var tickEls = dialTicksEl.querySelectorAll('[data-layer="' + layerName + '"][data-k="' + hit.k + '"]');
+    tickEls.forEach(function(el){ el.classList.toggle('hit', active); });
+  }
+
+  setPoly(5, 4);
+
+  /* ============ hero ambient decoration (silent) ============ */
+  var heroTicksEl = document.getElementById('heroTicks');
+  var heroArmsEl = document.getElementById('heroArms');
+  (function(){
+    var a = 3, b = 2;
+    var html = '';
+    for(var i=0;i<a;i++){
+      var p = polarPoint(150,150,130, i*360/a);
+      html += '<circle class="tick-dot tickA" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4"></circle>';
+    }
+    for(var j=0;j<b;j++){
+      var q = polarPoint(150,150,92, j*360/b);
+      html += '<circle class="tick-dot tickB" cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="4"></circle>';
+    }
+    heroTicksEl.innerHTML = html;
+  })();
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduceMotion){
+    var heroT = 2.4; // seconds per bar, purely decorative
+    function heroLoop(ts){
+      var phase = (ts/1000 / heroT) % 1;
+      heroArmsEl.setAttribute('transform', 'rotate(' + (phase*360).toFixed(2) + ',150,150)');
+      requestAnimationFrame(heroLoop);
+    }
+    requestAnimationFrame(heroLoop);
+  }
+
+})();
+</script>
+</body>
+</html>

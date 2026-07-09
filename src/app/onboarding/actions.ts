@@ -32,10 +32,27 @@ export async function createProfile(
     return { error: "Display name must be 1-60 characters." };
   }
 
+  // Carry over what the OAuth provider already told us so the profile isn't
+  // blank after sign-up. GitHub exposes the login as user_name; Google/GitHub
+  // both expose a photo as avatar_url or picture.
+  const meta = user.user_metadata ?? {};
+  const avatarUrl =
+    (meta.avatar_url as string | undefined) ??
+    (meta.picture as string | undefined) ??
+    null;
+  const githubUsername =
+    user.app_metadata?.provider === "github"
+      ? ((meta.user_name as string | undefined) ??
+        (meta.preferred_username as string | undefined) ??
+        null)
+      : null;
+
   const { error } = await supabase.from("profiles").insert({
     user_id: user.id,
     username,
     display_name: displayName,
+    avatar_url: avatarUrl,
+    github_username: githubUsername,
   });
 
   if (error) {

@@ -3,7 +3,13 @@
 import { useActionState } from "react";
 import { createProfile, type OnboardingState } from "./actions";
 
-export function OnboardingForm() {
+export function OnboardingForm({
+  defaultDisplayName = "",
+  defaultUsername = "",
+}: {
+  defaultDisplayName?: string;
+  defaultUsername?: string;
+}) {
   const [state, formAction, pending] = useActionState<OnboardingState, FormData>(
     createProfile,
     null
@@ -27,6 +33,7 @@ export function OnboardingForm() {
             maxLength={30}
             pattern="[a-z0-9][a-z0-9_\-]{2,29}"
             placeholder="yourname"
+            defaultValue={defaultUsername}
             autoCapitalize="none"
             autoCorrect="off"
             className={inputClass}
@@ -41,6 +48,7 @@ export function OnboardingForm() {
           required
           maxLength={60}
           placeholder="Your Name"
+          defaultValue={defaultDisplayName}
           className={inputClass}
         />
       </label>

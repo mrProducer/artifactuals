@@ -24,6 +24,19 @@ export default async function OnboardingPage() {
     redirect(`/${profile.username}`);
   }
 
+  const meta = user.user_metadata ?? {};
+  const defaultDisplayName =
+    (meta.full_name as string | undefined) ??
+    (meta.name as string | undefined) ??
+    "";
+  const suggestedUsername = (
+    (meta.user_name as string | undefined) ??
+    (meta.preferred_username as string | undefined) ??
+    ""
+  )
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "");
+
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-12">
       <h1 className="text-2xl font-semibold tracking-tight">
@@ -32,7 +45,10 @@ export default async function OnboardingPage() {
       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
         Pick a username — it becomes your public URL.
       </p>
-      <OnboardingForm />
+      <OnboardingForm
+        defaultDisplayName={defaultDisplayName}
+        defaultUsername={suggestedUsername}
+      />
     </main>
   );
 }
