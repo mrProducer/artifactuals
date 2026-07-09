@@ -8,6 +8,10 @@ import { createClient } from "@/lib/supabase/client";
 type Mode = "sign-in" | "sign-up";
 type OAuthProvider = "google" | "github";
 
+// Providers enabled in Supabase. Add "github" here once its credentials are
+// configured in Authentication -> Sign In / Providers.
+const ENABLED_PROVIDERS: OAuthProvider[] = ["google"];
+
 export function LoginForm() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("sign-in");
@@ -64,32 +68,44 @@ export function LoginForm() {
 
   return (
     <div className="mt-8 flex flex-col gap-4">
-      <div className="flex flex-col gap-2.5">
-        <button
-          type="button"
-          onClick={() => handleOAuth("google")}
-          disabled={oauthPending !== null}
-          className={oauthClass}
-        >
-          <GoogleLogo size={18} weight="bold" />
-          {oauthPending === "google" ? "Redirecting..." : "Continue with Google"}
-        </button>
-        <button
-          type="button"
-          onClick={() => handleOAuth("github")}
-          disabled={oauthPending !== null}
-          className={oauthClass}
-        >
-          <GithubLogo size={18} weight="fill" />
-          {oauthPending === "github" ? "Redirecting..." : "Continue with GitHub"}
-        </button>
-      </div>
+      {ENABLED_PROVIDERS.length > 0 && (
+        <>
+          <div className="flex flex-col gap-2.5">
+            {ENABLED_PROVIDERS.includes("google") && (
+              <button
+                type="button"
+                onClick={() => handleOAuth("google")}
+                disabled={oauthPending !== null}
+                className={oauthClass}
+              >
+                <GoogleLogo size={18} weight="bold" />
+                {oauthPending === "google"
+                  ? "Redirecting..."
+                  : "Continue with Google"}
+              </button>
+            )}
+            {ENABLED_PROVIDERS.includes("github") && (
+              <button
+                type="button"
+                onClick={() => handleOAuth("github")}
+                disabled={oauthPending !== null}
+                className={oauthClass}
+              >
+                <GithubLogo size={18} weight="fill" />
+                {oauthPending === "github"
+                  ? "Redirecting..."
+                  : "Continue with GitHub"}
+              </button>
+            )}
+          </div>
 
-      <div className="flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-600">
-        <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-        or
-        <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-      </div>
+          <div className="flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-600">
+            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+            or
+            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+        </>
+      )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <label className="flex flex-col gap-1.5 text-sm font-medium">

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 392 68" role="img" aria-label="Artifactuals">
+  <!-- Horizontal lockup: three-facet triangle mark + wordmark, vertically centered.
+       Symmetric outline and centered interior vertex (all on x=34).
+       The wordmark is live <text> for easy editing; convert to outlines (paths)
+       before shipping so it renders identically everywhere. -->
+  <g>
+    <polygon points="34,12 10,56 34,41" fill="#1A1A1A"/>
+    <polygon points="10,56 58,56 34,41" fill="#565656"/>
+    <polygon points="34,12 58,56 34,41" fill="#9A9A9A"/>
+  </g>
+  <text x="84" y="48"
+        font-family="Geist, 'Geist Sans', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+        font-size="40" font-weight="600" letter-spacing="-1.6" fill="#1A1A1A">artifactuals</text>
+</svg>

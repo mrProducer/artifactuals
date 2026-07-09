@@ -658,23 +658,33 @@ the product. Nothing here changes the sandboxed artifact rendering.
 
 ## 14. Logo
 
-The wordmark is set: a **sharp-cornered black square containing a negative-space
-"A"**, followed by the lowercase wordmark **`artifactuals`** in a tight
-geometric sans (Geist-family). The square mark reuses the product's core
-signature — 0-radius plates and negative space — so the logo and the UI speak
-the same language. The mark stands alone as the app icon / favicon; the lockup
+The mark is a **flat, three-facet triangle** (a low-poly tetrahedron silhouette
+rendered with solid fills and hard edges — no gradients, no 3D shading, no
+rounded corners), paired with the lowercase wordmark **`artifactuals`** in a
+tight geometric sans (Geist-family). It reuses the product's core signature —
+sharp geometry and monochrome restraint — so logo and UI speak the same
+language. The mark stands alone as the app icon / favicon; the lockup
 (mark + wordmark) is for the header and marketing.
 
-**Monochrome adaptation.** ✅ **Decided:** the cobalt notch in the "A" is
-retired and replaced with a **tonal gray** step inside the black square —
-approx `oklch(0.62 0 0)` (~`#8A8A8A`) on light backgrounds — keeping the mark
-fully monochrome and on-system. (If a warm accent is ever enabled per §3.3,
-the notch would move to that accent so logo and UI share the one hue.)
+> **Evolution note.** Earlier drafts (a square with a negative-space "A") were
+> dropped: the solid-wedge "A" read too close to the Adobe mark. The triangle is
+> the resolved direction. Image generators (Gemini included) kept re-rendering
+> it as a lit 3D pyramid with gradients, which violates the anti-slop bans
+> (§2.2), so the mark is authored **directly as SVG** rather than as a raster —
+> flat `<polygon>` fills, infinitely scalable, restyleable via CSS.
 
-**Deliverables to produce from the mark:**
-- `mark` and `lockup`, each as SVG + transparent PNG.
-- Mono (all-ink) and reversed (all-paper) variants for light/dark chrome and the
-  sticky header.
-- Favicon / app-icon export from the standalone square mark.
-- Store under `public/` (e.g. `public/logo/`); the source draft is in
-  `assets/`.
+**Facet tones (light bg):** `#1A1A1A` (left), `#565656` (bottom), `#9A9A9A`
+(right). Reversed (dark bg): `#FAFAF7` / `#B0B0B0` / `#6E6E6E`.
+
+**Assets (authored, live in the repo):**
+- `public/logo/mark.svg` — three-facet triangle, light backgrounds.
+- `public/logo/mark-reversed.svg` — three-facet triangle, dark backgrounds.
+- `public/logo/mark-solid.svg` — single-fill silhouette using `currentColor`;
+  **use this at tiny sizes (favicon ≤ 32px)** where the three facets muddy, and
+  anywhere a one-color mark is needed.
+- `public/logo/lockup.svg` — mark + wordmark; wordmark is live `<text>` for
+  editing — **convert to outlines before shipping** so it renders identically
+  without the font installed.
+
+**Still to produce:** favicon/app-icon exports (from `mark-solid.svg`) and PNG
+fallbacks if needed. Raster explorations remain in `assets/`.
