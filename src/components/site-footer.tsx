@@ -7,12 +7,18 @@ export function SiteFooter() {
         <p className="font-mono text-meta text-fg-subtle">
           © {new Date().getFullYear()} Artifactuals
         </p>
-        <nav className="flex items-center gap-5 text-small text-fg-muted">
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-small text-fg-muted">
           <Link href="/feed" className="transition-colors hover:text-fg">
             Feed
           </Link>
           <Link href="/guidelines" className="transition-colors hover:text-fg">
             Guidelines
+          </Link>
+          <Link href="/privacy" className="transition-colors hover:text-fg">
+            Privacy
+          </Link>
+          <Link href="/terms" className="transition-colors hover:text-fg">
+            Terms
           </Link>
         </nav>
       </div>
