@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getViewer, isModerator } from "@/lib/moderation";
+import { AdminNav } from "@/components/admin/admin-nav";
 
 export const metadata = { title: "Admin" };
 
@@ -26,6 +27,7 @@ export default async function AdminLayout({
             {role}
           </span>
         </header>
+        <AdminNav />
         {children}
       </div>
     </div>

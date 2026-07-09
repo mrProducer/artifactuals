@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/avatar";
 import { resolveAvatarUrl } from "@/lib/profile";
 import { SignOutButton } from "@/components/sign-out-button";
+import { SearchBox } from "@/components/search-box";
 import { Logo } from "@/components/ui/logo";
 import { NavLink } from "@/components/ui/nav-link";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -43,10 +44,12 @@ export async function SiteHeader() {
             </span>
           </Link>
           <NavLink href="/feed">Feed</NavLink>
+          <NavLink href="/users">Users</NavLink>
           {isModerator && <NavLink href="/admin">Admin</NavLink>}
         </div>
 
         <nav className="flex items-center gap-2">
+          <SearchBox />
           <ThemeToggle />
           {user ? (
             <>

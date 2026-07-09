@@ -2,7 +2,15 @@
 
 import { createClient } from "@/lib/supabase/server";
 import type { FeedArtifact } from "@/components/feed-post";
-import { FEED_SELECT, FEED_PAGE_SIZE, type FeedBatch } from "@/lib/feed";
+import type { FeedMember } from "@/components/new-member-card";
+import {
+  FEED_SELECT,
+  FEED_PAGE_SIZE,
+  MEMBER_SELECT,
+  FEED_MEMBER_PAGE_SIZE,
+  type FeedBatch,
+  type MemberBatch,
+} from "@/lib/feed";
 
 /**
  * Fetch a page of the feed for incremental "load more". The tab and the
@@ -65,5 +73,48 @@ export async function loadMoreFeed(
     artifacts,
     likedIds,
     hasMore: artifacts.length === FEED_PAGE_SIZE,
+  };
+}
+
+/**
+ * Fetch a page of newly-joined members for the "New members" feed tab, plus
+ * which of them the viewer already follows (so the follow buttons render in the
+ * right state). Banned accounts are excluded.
+ */
+export async function loadMoreMembers(offset: number): Promise<MemberBatch> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const from = Math.max(offset, 0);
+  const to = from + FEED_MEMBER_PAGE_SIZE - 1;
+
+  const { data } = await supabase
+    .from("profiles")
+    .select(MEMBER_SELECT)
+    .is("banned_at", null)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  const members = (data ?? []) as FeedMember[];
+
+  let followingIds: string[] = [];
+  if (user && members.length > 0) {
+    const { data: follows } = await supabase
+      .from("follows")
+      .select("followee_id")
+      .eq("follower_id", user.id)
+      .in(
+        "followee_id",
+        members.map((m) => m.user_id)
+      );
+    followingIds = follows?.map((f) => f.followee_id) ?? [];
+  }
+
+  return {
+    members,
+    followingIds,
+    hasMore: members.length === FEED_MEMBER_PAGE_SIZE,
   };
 }

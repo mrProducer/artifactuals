@@ -1,9 +1,16 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { type FeedArtifact } from "@/components/feed-post";
+import { type FeedMember } from "@/components/new-member-card";
 import { FeedList } from "@/components/feed-list";
+import { MemberList } from "@/components/member-list";
 import { buttonClass } from "@/components/ui/button";
-import { FEED_SELECT, FEED_PAGE_SIZE } from "@/lib/feed";
+import {
+  FEED_SELECT,
+  FEED_PAGE_SIZE,
+  MEMBER_SELECT,
+  FEED_MEMBER_PAGE_SIZE,
+} from "@/lib/feed";
 
 export const metadata = { title: "Feed" };
 
@@ -27,14 +34,38 @@ export default async function FeedPage({ searchParams }: Props) {
     followeeIds = follows?.map((f) => f.followee_id) ?? [];
   }
 
-  const requestedTab = tab === "following" ? "following" : "trending";
+  const requestedTab =
+    tab === "following" ? "following" : tab === "new" ? "new" : "trending";
   const activeTab =
-    requestedTab === "following" && followeeIds.length > 0
-      ? "following"
-      : "trending";
+    requestedTab === "following" && followeeIds.length === 0
+      ? "trending"
+      : requestedTab;
 
   let artifacts: FeedArtifact[] = [];
-  if (activeTab === "following") {
+  let members: FeedMember[] = [];
+  let memberFollowingIds: string[] = [];
+
+  if (activeTab === "new") {
+    const { data } = await supabase
+      .from("profiles")
+      .select(MEMBER_SELECT)
+      .is("banned_at", null)
+      .order("created_at", { ascending: false })
+      .limit(FEED_MEMBER_PAGE_SIZE);
+    members = (data ?? []) as FeedMember[];
+
+    if (user && members.length > 0) {
+      const { data: follows } = await supabase
+        .from("follows")
+        .select("followee_id")
+        .eq("follower_id", user.id)
+        .in(
+          "followee_id",
+          members.map((m) => m.user_id)
+        );
+      memberFollowingIds = follows?.map((f) => f.followee_id) ?? [];
+    }
+  } else if (activeTab === "following") {
     const { data } = await supabase
       .from("artifacts")
       .select(FEED_SELECT)
@@ -91,6 +122,12 @@ export default async function FeedPage({ searchParams }: Props) {
               Following
             </Link>
           )}
+          <Link
+            href="/feed?tab=new"
+            className={tabClass(activeTab === "new")}
+          >
+            New members
+          </Link>
         </div>
 
         {requestedTab === "following" && followeeIds.length === 0 && (
@@ -100,11 +137,26 @@ export default async function FeedPage({ searchParams }: Props) {
           </p>
         )}
 
-        {artifacts.length > 0 ? (
+        {activeTab === "new" ? (
+          members.length > 0 ? (
+            <MemberList
+              initialMembers={members}
+              initialFollowingIds={memberFollowingIds}
+              signedIn={user !== null}
+              viewerId={user?.id ?? null}
+            />
+          ) : (
+            <div className="mt-3 flex flex-col items-center gap-4 border border-dashed border-border bg-surface px-4 py-16 text-center sm:mx-0">
+              <p className="font-mono text-label uppercase text-fg-subtle">
+                No members yet
+              </p>
+            </div>
+          )
+        ) : artifacts.length > 0 ? (
           <FeedList
             initialArtifacts={artifacts}
             initialLikedIds={[...likedIds]}
-            tab={activeTab}
+            tab={activeTab === "following" ? "following" : "trending"}
             signedIn={user !== null}
           />
         ) : (
