@@ -36,6 +36,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description =
     artifact.description ?? `An interactive artifact on Artifactuals`;
 
+  // NOTE: the og:image / twitter:image come from the colocated
+  // `opengraph-image.tsx` (real screenshot when it exists, branded card
+  // otherwise). Setting images here too would emit duplicate, conflicting
+  // tags, so we intentionally leave them out.
   return {
     title: artifact.title,
     description,
@@ -45,17 +49,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `${siteUrl}/a/${artifact.id}`,
       siteName: "Artifactuals",
       type: "website",
-      ...(artifact.preview_image_url
-        ? { images: [{ url: artifact.preview_image_url, width: 1200, height: 630 }] }
-        : {}),
     },
     twitter: {
       card: "summary_large_image",
       title: artifact.title,
       description,
-      ...(artifact.preview_image_url
-        ? { images: [artifact.preview_image_url] }
-        : {}),
     },
   };
 }
