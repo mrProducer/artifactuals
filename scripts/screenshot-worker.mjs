@@ -20,7 +20,8 @@ import { createClient } from "@supabase/supabase-js";
 import { chromium } from "playwright";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
 const APP_URL = process.env.SCREENSHOT_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 const VIEWPORT = { width: 1200, height: 630 }; // OG/Twitter Card standard
@@ -28,7 +29,9 @@ const RENDER_SETTLE_MS = 2500;
 const PAGE_TIMEOUT_MS = 20000;
 
 if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
-  console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+  console.error(
+    "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SECRET_KEY / SUPABASE_SERVICE_ROLE_KEY"
+  );
   process.exit(1);
 }
 

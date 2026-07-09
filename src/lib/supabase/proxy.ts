@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/supabase/env";
 
 /**
  * Refreshes the Supabase auth session on every matched request so Server
@@ -9,13 +10,13 @@ export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   // No-op until the Supabase project is created and env vars are set.
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  if (!SUPABASE_URL) {
     return response;
   }
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    SUPABASE_URL!,
+    SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {

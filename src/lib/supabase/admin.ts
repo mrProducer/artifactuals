@@ -1,5 +1,6 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
+import { SUPABASE_SECRET_KEY, SUPABASE_URL } from "@/lib/supabase/env";
 
 /**
  * Service-role client — bypasses RLS. Server-only; never import from client
@@ -7,8 +8,8 @@ import type { Database } from "@/lib/database.types";
  */
 export function createAdminClient() {
   return createSupabaseClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    SUPABASE_URL!,
+    SUPABASE_SECRET_KEY!,
     { auth: { persistSession: false } }
   );
 }
