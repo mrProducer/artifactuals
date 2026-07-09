@@ -80,7 +80,7 @@ export default async function FeedPage({ searchParams }: Props) {
     <div className="flex-1 bg-zinc-100 dark:bg-zinc-950">
       <main className="mx-auto w-full max-w-[600px] pb-16">
         {/* Tabs */}
-        <div className="flex items-end gap-6 border-b border-zinc-200 bg-white px-4 pt-3 sm:mt-4 sm:rounded-t-lg sm:border-x sm:border-t dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-end gap-6 border-b border-zinc-200 bg-white px-4 pt-3 sm:mt-6 sm:border-x sm:border-t dark:border-zinc-800 dark:bg-zinc-900">
           <Link href="/feed" className={tabClass(activeTab === "trending")}>
             Trending
           </Link>
@@ -113,7 +113,7 @@ export default async function FeedPage({ searchParams }: Props) {
             ))}
           </div>
         ) : (
-          <div className="border-b border-zinc-200 bg-white px-4 py-16 text-center sm:rounded-b-lg sm:border-x dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="border-b border-zinc-200 bg-white px-4 py-16 text-center sm:border-x dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
               Nothing here yet.{" "}
               <Link

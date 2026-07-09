@@ -63,7 +63,7 @@ export function CommentsSection({
             maxLength={1000}
             rows={2}
             placeholder="Say something about this artifact..."
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400"
+            className="w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400"
           />
           {error && (
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
@@ -71,7 +71,7 @@ export function CommentsSection({
           <button
             type="submit"
             disabled={pending}
-            className="self-end rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+            className="self-end bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
           >
             {pending ? "Posting..." : "Comment"}
           </button>

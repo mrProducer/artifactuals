@@ -65,7 +65,7 @@ export function ReportButton({
         maxLength={500}
         rows={2}
         placeholder={`Why are you reporting this ${targetType}?`}
-        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900"
+        className="w-full border border-zinc-300 bg-white px-3 py-2 text-xs outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900"
       />
       {status && (
         <span className="text-xs text-red-600 dark:text-red-400">{status}</span>
@@ -74,7 +74,7 @@ export function ReportButton({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-zinc-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+          className="bg-zinc-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
         >
           {pending ? "Sending..." : "Submit report"}
         </button>

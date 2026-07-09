@@ -40,7 +40,7 @@ export function FollowButton({
       <button
         onClick={handleClick}
         disabled={pending}
-        className={`rounded-full px-5 py-1.5 text-sm font-medium transition-colors ${
+        className={`px-5 py-1.5 text-sm font-medium transition-colors ${
           following
             ? "border border-zinc-300 text-zinc-600 hover:border-red-400 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-400"
             : "bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"

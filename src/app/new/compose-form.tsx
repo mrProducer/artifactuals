@@ -6,7 +6,7 @@ import { ArtifactFrame } from "@/components/artifact-frame";
 import { publishArtifact, ARTIFACT_TAGS, type PublishState } from "./actions";
 
 const inputClass =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400";
+  "w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400";
 
 export function ComposeForm({ userId }: { userId: string }) {
   const [state, formAction, pending] = useActionState<PublishState, FormData>(
@@ -62,7 +62,7 @@ export function ComposeForm({ userId }: { userId: string }) {
   }
 
   const previewPane = (
-    <div className="flex h-full min-h-[320px] flex-col overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+    <div className="flex h-full min-h-[320px] flex-col overflow-hidden border border-zinc-200 dark:border-zinc-800">
       <div className="flex items-center justify-between border-b border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
         <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
           Preview — exactly how your published artifact will run
@@ -71,7 +71,7 @@ export function ComposeForm({ userId }: { userId: string }) {
           type="button"
           onClick={() => updatePreview()}
           disabled={previewLoading || !html.trim()}
-          className="rounded-md bg-zinc-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
+          className="bg-zinc-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
         >
           {previewLoading ? "Loading..." : "Update preview"}
         </button>
@@ -109,7 +109,7 @@ export function ComposeForm({ userId }: { userId: string }) {
           type="file"
           accept=".html,text/html"
           onChange={handleFileUpload}
-          className="text-sm file:mr-2 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-xs file:font-medium dark:file:bg-zinc-800 dark:file:text-zinc-200"
+          className="text-sm file:mr-2 file:file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-xs file:font-medium dark:file:bg-zinc-800 dark:file:text-zinc-200"
         />
       </label>
     </div>
@@ -128,7 +128,7 @@ export function ComposeForm({ userId }: { userId: string }) {
             onClick={() =>
               tab === "preview" ? updatePreview("preview") : setMobileTab(tab)
             }
-            className={`rounded-full px-4 py-1.5 text-sm font-medium capitalize ${
+            className={`px-4 py-1.5 text-sm font-medium capitalize ${
               mobileTab === tab
                 ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
                 : "border border-zinc-300 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400"
@@ -171,7 +171,7 @@ export function ComposeForm({ userId }: { userId: string }) {
           {ARTIFACT_TAGS.map((tag) => (
             <label
               key={tag}
-              className="flex cursor-pointer items-center gap-1.5 rounded-full border border-zinc-300 px-3 py-1.5 text-sm has-checked:border-zinc-900 has-checked:bg-zinc-900 has-checked:text-white dark:border-zinc-700 dark:has-checked:border-zinc-100 dark:has-checked:bg-zinc-100 dark:has-checked:text-zinc-900"
+              className="flex cursor-pointer items-center gap-1.5 border border-zinc-300 px-3 py-1.5 text-sm has-checked:border-zinc-900 has-checked:bg-zinc-900 has-checked:text-white dark:border-zinc-700 dark:has-checked:border-zinc-100 dark:has-checked:bg-zinc-100 dark:has-checked:text-zinc-900"
             >
               <input
                 type="checkbox"
@@ -192,7 +192,7 @@ export function ComposeForm({ userId }: { userId: string }) {
       <button
         type="submit"
         disabled={pending || !html.trim()}
-        className="self-start rounded-lg bg-zinc-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        className="self-start bg-zinc-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
       >
         {pending ? "Publishing..." : "Publish"}
       </button>

@@ -13,7 +13,7 @@ import { toggleLike } from "@/app/actions/social";
 const ICON_SIZE = 22;
 
 const actionClass =
-  "flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 active:scale-[0.96] dark:text-zinc-400 dark:hover:bg-zinc-800";
+  "flex items-center gap-1.5 px-2 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.96] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50";
 
 export function FeedPostActions({
   artifactId,

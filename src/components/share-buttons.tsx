@@ -14,7 +14,7 @@ export function ShareButtons({ url, title }: { url: string; title: string }) {
   const linkedInHref = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
 
   const buttonClass =
-    "rounded-full border border-zinc-300 px-3.5 py-1.5 text-sm font-medium text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500";
+    "border border-zinc-300 px-3.5 py-1.5 text-sm font-medium text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500";
 
   return (
     <div className="flex items-center gap-2">

@@ -147,7 +147,7 @@ export default async function ArtifactPage({ params }: Props) {
           {artifact.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
+              className="bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
             >
               {tag}
             </span>
@@ -156,7 +156,7 @@ export default async function ArtifactPage({ params }: Props) {
       )}
 
       {/* The live artifact */}
-      <div className="mt-5 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+      <div className="mt-5 overflow-hidden border border-zinc-200 dark:border-zinc-800">
         <ArtifactFrame
           src={`${sandboxBaseUrl()}/sandbox/a/${artifact.id}`}
           title={artifact.title}

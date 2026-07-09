@@ -30,7 +30,7 @@ export function FeedPost({
   const creator = artifact.profiles;
 
   return (
-    <article className="border-y border-zinc-200 bg-white sm:rounded-lg sm:border-x dark:border-zinc-800 dark:bg-zinc-900">
+    <article className="border-y border-zinc-200 bg-white sm:border-x dark:border-zinc-800 dark:bg-zinc-900">
       {/* Creator header */}
       <div className="flex items-center gap-3 px-4 pt-3.5 pb-3">
         {creator && (

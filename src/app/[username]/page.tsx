@@ -137,7 +137,7 @@ export default async function ProfilePage({ params }: Props) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 hover:border-zinc-400 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-600"
+                  className="border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 hover:border-zinc-400 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-600"
                 >
                   {link.label}
                 </a>
@@ -149,7 +149,7 @@ export default async function ProfilePage({ params }: Props) {
         {isOwner ? (
           <Link
             href="/settings/profile"
-            className="self-start rounded-full border border-zinc-300 px-4 py-1.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            className="self-start border border-zinc-300 px-4 py-1.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
           >
             Edit profile
           </Link>
@@ -178,7 +178,7 @@ export default async function ProfilePage({ params }: Props) {
                 href={repo.html_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-xl border border-zinc-200 p-4 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+                className="border border-zinc-200 p-4 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate text-sm font-medium">
@@ -210,7 +210,7 @@ export default async function ProfilePage({ params }: Props) {
               <Link
                 key={artifact.id}
                 href={`/a/${artifact.id}`}
-                className="group overflow-hidden rounded-xl border border-zinc-200 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+                className="group overflow-hidden border border-zinc-200 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
               >
                 <div className="aspect-[1200/630] bg-zinc-100 dark:bg-zinc-900">
                   {artifact.preview_image_url && (
@@ -225,7 +225,7 @@ export default async function ProfilePage({ params }: Props) {
                 <div className="p-3">
                   <div className="flex items-center gap-2">
                     {artifact.is_pinned && (
-                      <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+                      <span className="bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-700 dark:bg-amber-950 dark:text-amber-400">
                         Pinned
                       </span>
                     )}
@@ -242,7 +242,7 @@ export default async function ProfilePage({ params }: Props) {
             ))}
           </div>
         ) : (
-          <p className="mt-3 rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">
+          <p className="mt-3 border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">
             {isOwner
               ? "You haven't published anything yet."
               : `${profile.display_name} hasn't published anything yet.`}

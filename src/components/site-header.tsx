@@ -21,33 +21,36 @@ export async function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-zinc-800 dark:bg-black/90">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
-        <div className="flex items-center gap-5">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
+    <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/95 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
+      <div className="mx-auto flex h-12 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="flex items-center gap-6">
+          <Link
+            href="/"
+            className="text-[15px] font-semibold tracking-tight text-zinc-950 dark:text-zinc-50"
+          >
             Artifactuals
           </Link>
           <Link
             href="/feed"
-            className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="text-sm text-zinc-500 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
           >
             Feed
           </Link>
         </div>
 
-        <nav className="flex items-center gap-3 text-sm">
+        <nav className="flex items-center gap-2 text-sm">
           {user ? (
             <>
               <Link
                 href="/new"
-                className="rounded-full bg-zinc-900 px-4 py-1.5 font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+                className="border border-zinc-950 bg-zinc-950 px-3.5 py-1 font-medium text-white transition-colors hover:bg-zinc-700 active:translate-y-px dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-300"
               >
-                + New
+                New
               </Link>
               {profile ? (
                 <Link
                   href={`/${profile.username}`}
-                  className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                  className="flex items-center gap-2 px-1.5 py-1 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900"
                 >
                   <Avatar
                     name={profile.display_name}
@@ -61,7 +64,7 @@ export async function SiteHeader() {
               ) : (
                 <Link
                   href="/onboarding"
-                  className="font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                  className="font-medium text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
                 >
                   Finish setup
                 </Link>
@@ -71,7 +74,7 @@ export async function SiteHeader() {
           ) : (
             <Link
               href="/login"
-              className="rounded-full bg-zinc-900 px-4 py-1.5 font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+              className="border border-zinc-950 bg-zinc-950 px-3.5 py-1 font-medium text-white transition-colors hover:bg-zinc-700 active:translate-y-px dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-300"
             >
               Sign in
             </Link>

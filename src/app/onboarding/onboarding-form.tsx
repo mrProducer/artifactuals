@@ -10,14 +10,14 @@ export function OnboardingForm() {
   );
 
   const inputClass =
-    "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400";
+    "w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400";
 
   return (
     <form action={formAction} className="mt-8 flex flex-col gap-4">
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         Username
         <div className="flex items-center gap-0">
-          <span className="rounded-l-lg border border-r-0 border-zinc-300 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">
+          <span className="border border-r-0 border-zinc-300 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">
             artifactuals.com/
           </span>
           <input
@@ -29,7 +29,7 @@ export function OnboardingForm() {
             placeholder="yourname"
             autoCapitalize="none"
             autoCorrect="off"
-            className={`${inputClass} rounded-l-none`}
+            className={inputClass}
           />
         </div>
       </label>
@@ -52,7 +52,7 @@ export function OnboardingForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        className="mt-2 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
       >
         {pending ? "Creating..." : "Create profile"}
       </button>
