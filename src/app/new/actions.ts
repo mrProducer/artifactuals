@@ -53,9 +53,7 @@ export async function uploadDraft(
     });
 
   if (error) {
-    const detail =
-      error instanceof Error ? error.message : JSON.stringify(error);
-    return { error: `Preview failed: ${detail}` };
+    return { error: "Preview failed. Please try again." };
   }
   return null;
 }
@@ -112,9 +110,7 @@ export async function publishArtifact(
     .upload(sourcePath, htmlBytes, { contentType: "text/html" });
 
   if (uploadError) {
-    return {
-      error: `Upload failed: ${uploadError instanceof Error ? uploadError.message : "please try again."}`,
-    };
+    return { error: "Upload failed. Please try again." };
   }
 
   const { data: artifact, error: insertError } = await supabase
@@ -132,9 +128,7 @@ export async function publishArtifact(
 
   if (insertError || !artifact) {
     await admin.storage.from("artifact-source").remove([sourcePath]);
-    return {
-      error: `Could not publish: ${insertError?.message ?? "please try again."}`,
-    };
+    return { error: "Could not publish. Please try again." };
   }
 
   redirect(`/a/${artifact.id}`);
