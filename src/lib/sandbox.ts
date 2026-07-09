@@ -14,6 +14,22 @@
 
 export const MAX_ARTIFACT_BYTES = 1024 * 1024; // 1 MB, matches storage bucket cap
 
+// The app can be served from either the apex or the www host (the apex
+// redirects to www in production), so the iframe must permit both as parents
+// — otherwise the browser blocks the embed with a CSP violation.
+function frameAncestors(appOrigin: string): string {
+  try {
+    const url = new URL(appOrigin);
+    const bareHost = url.host.replace(/^www\./, "");
+    return [
+      `${url.protocol}//${bareHost}`,
+      `${url.protocol}//www.${bareHost}`,
+    ].join(" ");
+  } catch {
+    return appOrigin;
+  }
+}
+
 // Artifacts built with Claude commonly pull libraries from CDNs
 // (script/style src https:), so those stay open. Exfiltration paths that
 // matter most — fetch/XHR/WebSocket and form posts — are closed.
@@ -28,7 +44,7 @@ function buildCsp(appOrigin: string): string {
     "connect-src 'none'",
     "form-action 'none'",
     "base-uri 'none'",
-    `frame-ancestors ${appOrigin}`,
+    `frame-ancestors ${frameAncestors(appOrigin)}`,
     "sandbox allow-scripts",
   ].join("; ");
 }
