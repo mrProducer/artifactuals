@@ -13,6 +13,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_DESCRIPTION =
+  "Publish and share the interactive artifacts you build with AI. A portfolio and social feed for AI creators.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
@@ -21,8 +24,19 @@ export const metadata: Metadata = {
     default: "Artifactuals",
     template: "%s | Artifactuals",
   },
-  description:
-    "Publish and share the interactive artifacts you build with AI. A portfolio and social feed for AI creators.",
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    siteName: "Artifactuals",
+    title: "Artifactuals",
+    description: SITE_DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Artifactuals",
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
