@@ -1,9 +1,8 @@
 "use client";
 
 import { useActionState, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { ArtifactFrame } from "@/components/artifact-frame";
-import { publishArtifact } from "./actions";
+import { publishArtifact, uploadDraft } from "./actions";
 import { ARTIFACT_TAGS, type PublishState } from "./constants";
 
 const inputClass =
@@ -37,22 +36,11 @@ export function ComposeForm({ userId }: { userId: string }) {
     setPreviewLoading(true);
     setPreviewError(null);
 
-    const supabase = createClient();
-    const path = `${userId}/drafts/${draftIdRef.current}.html`;
-    const { error } = await supabase.storage
-      .from("artifact-source")
-      .upload(path, new Blob([html], { type: "text/html" }), {
-        upsert: true,
-        contentType: "text/html",
-      });
+    const result = await uploadDraft(draftIdRef.current, html);
 
     setPreviewLoading(false);
-    if (error) {
-      setPreviewError(
-        error.message.includes("maximum allowed size")
-          ? "Artifact is over the 1 MB limit."
-          : "Preview failed. Please try again."
-      );
+    if (result?.error) {
+      setPreviewError(result.error);
       return;
     }
 

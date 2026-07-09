@@ -6,6 +6,53 @@ import { MAX_ARTIFACT_BYTES } from "@/lib/sandbox";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { ARTIFACT_TAGS, type PublishState } from "./constants";
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Compose-time preview upload. Runs server-side (unlike a direct browser
+ * Storage call) so it uses the request's authenticated session — the browser
+ * client doesn't reliably attach the user token to Storage requests.
+ */
+export async function uploadDraft(
+  draftId: string,
+  html: string
+): Promise<{ error: string } | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Your session expired. Refresh and sign in again." };
+  }
+  if (!UUID_RE.test(draftId)) {
+    return { error: "Preview failed. Please try again." };
+  }
+  if (!html.trim()) {
+    return { error: "Nothing to preview yet." };
+  }
+
+  const bytes = new TextEncoder().encode(html);
+  if (bytes.byteLength > MAX_ARTIFACT_BYTES) {
+    return {
+      error: `Artifact is over the 1 MB limit (${(bytes.byteLength / 1024).toFixed(0)} KB).`,
+    };
+  }
+
+  const { error } = await supabase.storage
+    .from("artifact-source")
+    .upload(`${user.id}/drafts/${draftId}.html`, bytes, {
+      upsert: true,
+      contentType: "text/html",
+    });
+
+  if (error) {
+    return { error: "Preview failed. Please try again." };
+  }
+  return null;
+}
+
 export async function publishArtifact(
   _prev: PublishState,
   formData: FormData
