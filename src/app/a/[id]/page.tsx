@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/avatar";
 import { resolveAvatarUrl } from "@/lib/profile";
-import { ArtifactFrame } from "@/components/artifact-frame";
+import { ArtifactViewer } from "@/components/artifact-viewer";
 import { LikeButton } from "@/components/like-button";
 import { ShareButtons } from "@/components/share-buttons";
 import { ReportButton } from "@/components/report-button";
@@ -157,11 +157,10 @@ export default async function ArtifactPage({ params }: Props) {
       )}
 
       {/* The live artifact */}
-      <div className="mt-5 overflow-hidden border border-zinc-200 dark:border-zinc-800">
-        <ArtifactFrame
+      <div className="mt-5">
+        <ArtifactViewer
           src={`${sandboxBaseUrl()}/sandbox/a/${artifact.id}`}
           title={artifact.title}
-          className="h-[70vh] min-h-[420px] w-full border-0 bg-white"
         />
       </div>
 
