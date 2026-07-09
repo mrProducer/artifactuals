@@ -3,7 +3,8 @@
 import { useActionState, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ArtifactFrame } from "@/components/artifact-frame";
-import { publishArtifact, ARTIFACT_TAGS, type PublishState } from "./actions";
+import { publishArtifact } from "./actions";
+import { ARTIFACT_TAGS, type PublishState } from "./constants";
 
 const inputClass =
   "w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400";

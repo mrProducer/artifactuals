@@ -4,17 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MAX_ARTIFACT_BYTES } from "@/lib/sandbox";
 import { checkRateLimit } from "@/lib/rate-limit";
-
-export type PublishState = { error: string } | null;
-
-export const ARTIFACT_TAGS = [
-  "game",
-  "tool",
-  "data-viz",
-  "education",
-  "art",
-  "other",
-] as const;
+import { ARTIFACT_TAGS, type PublishState } from "./constants";
 
 export async function publishArtifact(
   _prev: PublishState,
