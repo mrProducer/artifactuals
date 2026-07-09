@@ -17,15 +17,30 @@ Product docs live in [`docs/`](docs/):
 
 ## Local development
 
-Requires Node 20+ (`nvm use 22.13.1`).
+Requires Node 20+ (`nvm use 22.13.1`) and Docker (for local Supabase).
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in your Supabase project values
+npx supabase start           # local Postgres + Auth + Storage (Docker)
+cp .env.example .env.local   # fill in values printed by supabase start
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3000. Local auth uses email/password (no email
+confirmation); Google OAuth is added when the hosted project goes live.
+
+## Screenshot / OG-image worker
+
+Generates 1200x630 preview images for published artifacts (feed cards and
+link previews), rendering through the same sandbox route the site uses:
+
+```bash
+npm run screenshots         # one-shot
+npm run screenshots:watch   # poll every 30s
+```
+
+Runs anywhere Node + Playwright run; in production this becomes a small
+container or cron job, not a serverless function.
 
 ## Database migrations
 
