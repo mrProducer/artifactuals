@@ -673,8 +673,10 @@ language. The mark stands alone as the app icon / favicon; the lockup
 > (§2.2), so the mark is authored **directly as SVG** rather than as a raster —
 > flat `<polygon>` fills, infinitely scalable, restyleable via CSS.
 
-**Facet tones (light bg):** `#1A1A1A` (left), `#565656` (bottom), `#9A9A9A`
-(right). Reversed (dark bg): `#FAFAF7` / `#B0B0B0` / `#6E6E6E`.
+**Geometry:** symmetric outline with the interior vertex centered (all on the
+mark's vertical axis), so the three facets read as a balanced, front-facing
+tetrahedron. **Facet tones (light bg):** `#1A1A1A` (left), `#565656` (bottom),
+`#9A9A9A` (right). Reversed (dark bg): `#FAFAF7` / `#B0B0B0` / `#6E6E6E`.
 
 **Assets (authored, live in the repo):**
 - `public/logo/mark.svg` — three-facet triangle, light backgrounds.

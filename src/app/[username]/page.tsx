@@ -247,11 +247,21 @@ export default async function ProfilePage({ params }: Props) {
             ))}
           </div>
         ) : (
-          <p className="mt-3 border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">
-            {isOwner
-              ? "You haven't published anything yet."
-              : `${profile.display_name} hasn't published anything yet.`}
-          </p>
+          <div className="mt-3 flex flex-col items-center gap-4 border border-dashed border-zinc-300 p-8 text-center dark:border-zinc-700">
+            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+              {isOwner
+                ? "You haven't published anything yet."
+                : `${profile.display_name} hasn't published anything yet.`}
+            </p>
+            {isOwner && (
+              <Link
+                href="/new"
+                className="border border-zinc-950 bg-zinc-950 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 active:translate-y-px dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-300"
+              >
+                Publish your first artifact
+              </Link>
+            )}
+          </div>
         )}
       </section>
     </main>
