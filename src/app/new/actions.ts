@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MAX_ARTIFACT_BYTES } from "@/lib/sandbox";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export type PublishState = { error: string } | null;
 
@@ -46,6 +47,11 @@ export async function publishArtifact(
   }
   if (!html.trim()) {
     return { error: "Artifact HTML is empty." };
+  }
+
+  const limitError = await checkRateLimit("publish", user.id);
+  if (limitError) {
+    return { error: limitError };
   }
 
   const htmlBytes = new TextEncoder().encode(html);

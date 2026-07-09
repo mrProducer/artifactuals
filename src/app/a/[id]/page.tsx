@@ -4,6 +4,10 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/avatar";
 import { ArtifactFrame } from "@/components/artifact-frame";
+import { LikeButton } from "@/components/like-button";
+import { ShareButtons } from "@/components/share-buttons";
+import { ReportButton } from "@/components/report-button";
+import { CommentsSection, type CommentItem } from "@/components/comments-section";
 import { sandboxBaseUrl } from "@/lib/sandbox";
 
 type Props = { params: Promise<{ id: string }> };
@@ -64,8 +68,34 @@ export default async function ArtifactPage({ params }: Props) {
 
   const creator = artifact.profiles;
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [{ data: likeRow }, { data: comments }] = await Promise.all([
+    user
+      ? supabase
+          .from("likes")
+          .select("user_id")
+          .eq("user_id", user.id)
+          .eq("artifact_id", artifact.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    supabase
+      .from("comments")
+      .select(
+        "id, body, created_at, author_id, profiles:author_id (username, display_name, avatar_url)"
+      )
+      .eq("artifact_id", artifact.id)
+      .eq("status", "visible")
+      .order("created_at", { ascending: true })
+      .limit(200),
+  ]);
+
   // Fire-and-forget view count; SECURITY DEFINER RPC works for anon visitors
   supabase.rpc("increment_view_count", { p_artifact_id: artifact.id }).then();
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-6 sm:px-6">
@@ -99,10 +129,16 @@ export default async function ArtifactPage({ params }: Props) {
           )}
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400">
-          <span>{artifact.like_count} likes</span>
-          <span>{artifact.comment_count} comments</span>
-          <span>{artifact.view_count} views</span>
+        <div className="flex items-center gap-3">
+          <LikeButton
+            artifactId={artifact.id}
+            initialLiked={likeRow !== null}
+            initialCount={artifact.like_count}
+            signedIn={user !== null}
+          />
+          <span className="text-sm text-zinc-400 dark:text-zinc-500">
+            {artifact.view_count} views
+          </span>
         </div>
       </div>
 
@@ -120,13 +156,28 @@ export default async function ArtifactPage({ params }: Props) {
       )}
 
       {/* The live artifact */}
-      <div className="mt-5 flex-1 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+      <div className="mt-5 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
         <ArtifactFrame
           src={`${sandboxBaseUrl()}/sandbox/a/${artifact.id}`}
           title={artifact.title}
           className="h-[70vh] min-h-[420px] w-full border-0 bg-white"
         />
       </div>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <ShareButtons url={`${siteUrl}/a/${artifact.id}`} title={artifact.title} />
+        <ReportButton
+          targetType="artifact"
+          targetId={artifact.id}
+          signedIn={user !== null}
+        />
+      </div>
+
+      <CommentsSection
+        artifactId={artifact.id}
+        comments={(comments ?? []) as CommentItem[]}
+        currentUserId={user?.id ?? null}
+      />
     </main>
   );
 }

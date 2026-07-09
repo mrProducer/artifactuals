@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/avatar";
+import { FollowButton } from "@/components/follow-button";
 import { fetchGitHubProfile } from "@/lib/github";
 
 type Props = { params: Promise<{ username: string }> };
@@ -62,6 +63,18 @@ export default async function ProfilePage({ params }: Props) {
   ]);
 
   const isOwner = user?.id === profile.user_id;
+
+  let isFollowing = false;
+  if (user && !isOwner) {
+    const { data: followRow } = await supabase
+      .from("follows")
+      .select("follower_id")
+      .eq("follower_id", user.id)
+      .eq("followee_id", profile.user_id)
+      .maybeSingle();
+    isFollowing = followRow !== null;
+  }
+
   const github = profile.github_username
     ? await fetchGitHubProfile(profile.github_username)
     : null;
@@ -133,13 +146,22 @@ export default async function ProfilePage({ params }: Props) {
           )}
         </div>
 
-        {isOwner && (
+        {isOwner ? (
           <Link
             href="/settings/profile"
             className="self-start rounded-full border border-zinc-300 px-4 py-1.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
           >
             Edit profile
           </Link>
+        ) : (
+          <div className="self-start">
+            <FollowButton
+              followeeId={profile.user_id}
+              username={profile.username}
+              initialFollowing={isFollowing}
+              signedIn={user !== null}
+            />
+          </div>
         )}
       </section>
 
