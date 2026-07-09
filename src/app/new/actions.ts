@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { MAX_ARTIFACT_BYTES } from "@/lib/sandbox";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { ARTIFACT_TAGS, type PublishState } from "./constants";
@@ -40,7 +41,11 @@ export async function uploadDraft(
     };
   }
 
-  const { error } = await supabase.storage
+  // Write with the service-role client: the user is already verified above and
+  // the path is locked to their own folder, so this can't be used to write
+  // elsewhere. Avoids depending on Storage RLS, which rejects the token.
+  const admin = createAdminClient();
+  const { error } = await admin.storage
     .from("artifact-source")
     .upload(`${user.id}/drafts/${draftId}.html`, bytes, {
       upsert: true,
@@ -48,7 +53,6 @@ export async function uploadDraft(
     });
 
   if (error) {
-    // Surface the underlying Storage error while we diagnose the upload path.
     const detail =
       error instanceof Error ? error.message : JSON.stringify(error);
     return { error: `Preview failed: ${detail}` };
@@ -101,13 +105,16 @@ export async function publishArtifact(
     };
   }
 
+  const admin = createAdminClient();
   const sourcePath = `${user.id}/${crypto.randomUUID()}.html`;
-  const { error: uploadError } = await supabase.storage
+  const { error: uploadError } = await admin.storage
     .from("artifact-source")
     .upload(sourcePath, htmlBytes, { contentType: "text/html" });
 
   if (uploadError) {
-    return { error: "Upload failed. Please try again." };
+    return {
+      error: `Upload failed: ${uploadError instanceof Error ? uploadError.message : "please try again."}`,
+    };
   }
 
   const { data: artifact, error: insertError } = await supabase
@@ -124,8 +131,10 @@ export async function publishArtifact(
     .single();
 
   if (insertError || !artifact) {
-    await supabase.storage.from("artifact-source").remove([sourcePath]);
-    return { error: "Could not publish. Please try again." };
+    await admin.storage.from("artifact-source").remove([sourcePath]);
+    return {
+      error: `Could not publish: ${insertError?.message ?? "please try again."}`,
+    };
   }
 
   redirect(`/a/${artifact.id}`);
