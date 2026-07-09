@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Heart } from "@phosphor-icons/react";
 import { toggleLike } from "@/app/actions/social";
 
 export function LikeButton({
@@ -47,7 +48,11 @@ export function LikeButton({
           : "border-zinc-300 text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
       }`}
     >
-      <span aria-hidden="true">{liked ? "♥" : "♡"}</span>
+      <Heart
+        size={18}
+        weight={liked ? "fill" : "regular"}
+        className={liked ? "text-rose-500" : undefined}
+      />
       {count}
     </button>
   );

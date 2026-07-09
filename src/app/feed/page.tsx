@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { ArtifactCard, type FeedArtifact } from "@/components/artifact-card";
+import { FeedPost, type FeedArtifact } from "@/components/feed-post";
 
 export const metadata = { title: "Feed" };
 
@@ -55,51 +55,77 @@ export default async function FeedPage({ searchParams }: Props) {
     artifacts = data ?? [];
   }
 
+  // Which of the visible posts has the viewer liked (one query for the page)
+  let likedIds = new Set<string>();
+  if (user && artifacts.length > 0) {
+    const { data: likes } = await supabase
+      .from("likes")
+      .select("artifact_id")
+      .eq("user_id", user.id)
+      .in(
+        "artifact_id",
+        artifacts.map((a) => a.id)
+      );
+    likedIds = new Set(likes?.map((l) => l.artifact_id));
+  }
+
   const tabClass = (selected: boolean) =>
-    `rounded-full px-4 py-1.5 text-sm font-medium ${
+    `border-b-2 px-1 pb-2.5 text-sm font-semibold transition-colors ${
       selected
-        ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-        : "border border-zinc-300 text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500"
+        ? "border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-50"
+        : "border-transparent text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
     }`;
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6">
-      <div className="flex items-center gap-2">
-        <Link href="/feed" className={tabClass(activeTab === "trending")}>
-          Trending
-        </Link>
-        {user && (
-          <Link
-            href="/feed?tab=following"
-            className={tabClass(activeTab === "following")}
-          >
-            Following
+    <div className="flex-1 bg-zinc-100 dark:bg-zinc-950">
+      <main className="mx-auto w-full max-w-[600px] pb-16">
+        {/* Tabs */}
+        <div className="flex items-end gap-6 border-b border-zinc-200 bg-white px-4 pt-3 sm:mt-4 sm:rounded-t-lg sm:border-x sm:border-t dark:border-zinc-800 dark:bg-zinc-900">
+          <Link href="/feed" className={tabClass(activeTab === "trending")}>
+            Trending
           </Link>
-        )}
-      </div>
-
-      {requestedTab === "following" && followeeIds.length === 0 && (
-        <p className="mt-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          You aren&apos;t following anyone yet — here&apos;s what&apos;s
-          trending instead.
-        </p>
-      )}
-
-      {artifacts.length > 0 ? (
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {artifacts.map((artifact) => (
-            <ArtifactCard key={artifact.id} artifact={artifact} />
-          ))}
+          {user && (
+            <Link
+              href="/feed?tab=following"
+              className={tabClass(activeTab === "following")}
+            >
+              Following
+            </Link>
+          )}
         </div>
-      ) : (
-        <p className="mt-6 rounded-xl border border-dashed border-zinc-300 p-12 text-center text-sm text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">
-          Nothing here yet. Be the first to{" "}
-          <Link href="/new" className="underline">
-            publish an artifact
-          </Link>
-          .
-        </p>
-      )}
-    </main>
+
+        {requestedTab === "following" && followeeIds.length === 0 && (
+          <p className="border-b border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-500 sm:border-x dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+            You aren&apos;t following anyone yet, so here&apos;s what&apos;s
+            trending.
+          </p>
+        )}
+
+        {artifacts.length > 0 ? (
+          <div className="flex flex-col gap-3 pt-3 sm:gap-4 sm:pt-4">
+            {artifacts.map((artifact) => (
+              <FeedPost
+                key={artifact.id}
+                artifact={artifact}
+                likedByViewer={likedIds.has(artifact.id)}
+                signedIn={user !== null}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="border-b border-zinc-200 bg-white px-4 py-16 text-center sm:rounded-b-lg sm:border-x dark:border-zinc-800 dark:bg-zinc-900">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Nothing here yet.{" "}
+              <Link
+                href="/new"
+                className="font-semibold text-zinc-900 hover:underline dark:text-zinc-100"
+              >
+                Publish the first artifact
+              </Link>
+            </p>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }

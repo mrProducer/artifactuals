@@ -46,7 +46,7 @@ export function CommentsSection({
   }
 
   return (
-    <section className="mt-8">
+    <section id="comments" className="mt-8">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
         Comments ({comments.length})
       </h2>
