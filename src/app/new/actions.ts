@@ -1,10 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MAX_ARTIFACT_BYTES } from "@/lib/sandbox";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { triggerScreenshotWorker } from "@/lib/trigger-screenshots";
 import { ARTIFACT_TAGS, type PublishState } from "./constants";
 
 const UUID_RE =
@@ -130,6 +132,10 @@ export async function publishArtifact(
     await admin.storage.from("artifact-source").remove([sourcePath]);
     return { error: "Could not publish. Please try again." };
   }
+
+  // Generate the preview screenshot now rather than waiting for the cron.
+  // Runs after the response is sent, so it never slows down publishing.
+  after(triggerScreenshotWorker);
 
   redirect(`/a/${artifact.id}`);
 }
