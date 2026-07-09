@@ -48,7 +48,10 @@ export async function uploadDraft(
     });
 
   if (error) {
-    return { error: "Preview failed. Please try again." };
+    // Surface the underlying Storage error while we diagnose the upload path.
+    const detail =
+      error instanceof Error ? error.message : JSON.stringify(error);
+    return { error: `Preview failed: ${detail}` };
   }
   return null;
 }
