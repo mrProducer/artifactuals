@@ -1,0 +1,37 @@
+name: Generate artifact screenshots
+
+# Renders published artifacts that don't yet have a preview image, using the
+# existing Playwright worker. Runs on a schedule and can be triggered manually.
+on:
+  schedule:
+    - cron: "*/15 * * * *" # every 15 minutes (GitHub may delay a few minutes)
+  workflow_dispatch: {}
+
+# Never let two runs overlap (they'd fight over the same pending artifacts).
+concurrency:
+  group: screenshots
+  cancel-in-progress: false
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Render pending screenshots
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          SCREENSHOT_APP_URL: ${{ secrets.SCREENSHOT_APP_URL }}
+        run: node scripts/screenshot-worker.mjs
