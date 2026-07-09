@@ -8,6 +8,7 @@ import { resolveAvatarUrl } from "@/lib/profile";
 import { ReportButton } from "@/components/report-button";
 import { inputClass } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { timeAgo } from "@/lib/time";
 
 export type CommentItem = {
   id: string;
@@ -83,6 +84,12 @@ export function CommentsSection({
         </p>
       )}
 
+      {comments.length === 0 && (
+        <p className="mt-4 font-mono text-meta text-fg-subtle">
+          No comments yet{currentUserId ? " — be the first." : "."}
+        </p>
+      )}
+
       <ul className="mt-4 flex flex-col gap-4">
         {comments.map((comment) => (
           <li key={comment.id} className="flex gap-3">
@@ -104,7 +111,7 @@ export function CommentsSection({
                   </Link>
                 )}
                 <span className="font-mono text-meta text-fg-subtle">
-                  {new Date(comment.created_at).toLocaleDateString()}
+                  {timeAgo(comment.created_at)}
                 </span>
               </div>
               <p className="mt-0.5 whitespace-pre-wrap break-words text-body text-fg">

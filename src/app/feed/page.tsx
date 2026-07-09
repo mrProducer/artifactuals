@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { FeedPost, type FeedArtifact } from "@/components/feed-post";
+import { type FeedArtifact } from "@/components/feed-post";
+import { FeedList } from "@/components/feed-list";
 import { buttonClass } from "@/components/ui/button";
+import { FEED_SELECT, FEED_PAGE_SIZE } from "@/lib/feed";
 
 export const metadata = { title: "Feed" };
-
-const FEED_SELECT =
-  "id, title, description, preview_image_url, like_count, comment_count, created_at, profiles:owner_id (username, display_name, avatar_url, bio, github_username)";
-const PAGE_SIZE = 30;
 
 type Props = { searchParams: Promise<{ tab?: string }> };
 
@@ -43,8 +41,8 @@ export default async function FeedPage({ searchParams }: Props) {
       .eq("status", "published")
       .in("owner_id", followeeIds)
       .order("created_at", { ascending: false })
-      .limit(PAGE_SIZE);
-    artifacts = data ?? [];
+      .limit(FEED_PAGE_SIZE);
+    artifacts = (data ?? []) as FeedArtifact[];
   } else {
     const { data } = await supabase
       .from("artifacts")
@@ -52,8 +50,8 @@ export default async function FeedPage({ searchParams }: Props) {
       .eq("status", "published")
       .order("trending_score", { ascending: false })
       .order("created_at", { ascending: false })
-      .limit(PAGE_SIZE);
-    artifacts = data ?? [];
+      .limit(FEED_PAGE_SIZE);
+    artifacts = (data ?? []) as FeedArtifact[];
   }
 
   // Which of the visible posts has the viewer liked (one query for the page)
@@ -103,17 +101,12 @@ export default async function FeedPage({ searchParams }: Props) {
         )}
 
         {artifacts.length > 0 ? (
-          <div className="flex flex-col gap-3 pt-3 sm:gap-4 sm:pt-4">
-            {artifacts.map((artifact, i) => (
-              <FeedPost
-                key={artifact.id}
-                artifact={artifact}
-                likedByViewer={likedIds.has(artifact.id)}
-                signedIn={user !== null}
-                index={i}
-              />
-            ))}
-          </div>
+          <FeedList
+            initialArtifacts={artifacts}
+            initialLikedIds={[...likedIds]}
+            tab={activeTab}
+            signedIn={user !== null}
+          />
         ) : (
           <div className="mt-3 flex flex-col items-center gap-4 border border-dashed border-border bg-surface px-4 py-16 text-center sm:mx-0">
             <p className="font-mono text-label uppercase text-fg-subtle">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { ArtifactFrame } from "@/components/artifact-frame";
 import { publishArtifact, uploadDraft } from "./actions";
 import { ARTIFACT_TAGS, type PublishState } from "./constants";
@@ -14,12 +14,16 @@ export function ComposeForm({ userId }: { userId: string }) {
   );
 
   const [html, setHtml] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [mobileTab, setMobileTab] = useState<"code" | "preview">("code");
   // One draft object per compose session, overwritten on each preview
   const draftIdRef = useRef<string>(crypto.randomUUID());
+  // Last HTML we successfully rendered, so auto-preview can skip no-op uploads.
+  const lastPreviewedRef = useRef<string>("");
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -43,11 +47,33 @@ export function ComposeForm({ userId }: { userId: string }) {
       return;
     }
 
+    lastPreviewedRef.current = html;
     // Cache-bust so the iframe reloads the updated draft
     setPreviewSrc(
       `/sandbox/d/${userId}/${draftIdRef.current}?v=${Date.now()}`
     );
   }
+
+  // Auto-refresh the preview shortly after the user stops editing, so the
+  // pane stays a live mirror without a manual click on every change. The
+  // upload is skipped when nothing changed since the last render.
+  useEffect(() => {
+    if (!html.trim() || html === lastPreviewedRef.current) return;
+    const timer = setTimeout(() => {
+      updatePreview();
+    }, 1000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [html]);
+
+  // Warn before leaving with unsaved, unpublished work in the editor.
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (html.trim()) e.preventDefault();
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [html]);
 
   const previewPane = (
     <div className="flex h-full min-h-[320px] flex-col overflow-hidden border border-border shadow-sm">
@@ -57,11 +83,12 @@ export function ComposeForm({ userId }: { userId: string }) {
         </span>
         <Button
           type="button"
+          variant="secondary"
           size="sm"
           onClick={() => updatePreview()}
           disabled={previewLoading || !html.trim()}
         >
-          {previewLoading ? "Loading..." : "Update preview"}
+          {previewLoading ? "Loading..." : "Refresh"}
         </Button>
       </div>
       {previewError ? (
@@ -74,7 +101,7 @@ export function ComposeForm({ userId }: { userId: string }) {
         />
       ) : (
         <p className="flex flex-1 items-center justify-center p-4 text-center font-mono text-meta text-fg-subtle">
-          Paste or upload HTML, then hit “Update preview”.
+          Paste or upload HTML — the preview updates automatically.
         </p>
       )}
     </div>
@@ -137,7 +164,17 @@ export function ComposeForm({ userId }: { userId: string }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
           Title
-          <input name="title" required maxLength={120} className={inputClass} />
+          <input
+            name="title"
+            required
+            maxLength={120}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className={inputClass}
+          />
+          <span className="text-right font-mono text-meta text-fg-subtle">
+            {title.length}/120
+          </span>
         </label>
         <label className="flex flex-col gap-1.5 text-small font-medium text-fg sm:col-span-2 sm:col-start-1">
           Description
@@ -145,9 +182,14 @@ export function ComposeForm({ userId }: { userId: string }) {
             name="description"
             maxLength={500}
             rows={2}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             placeholder="What does it do? What did you build it with?"
             className={inputClass}
           />
+          <span className="text-right font-mono text-meta text-fg-subtle">
+            {description.length}/500
+          </span>
         </label>
       </div>
 

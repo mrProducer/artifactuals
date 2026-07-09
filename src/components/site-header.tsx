@@ -5,6 +5,7 @@ import { resolveAvatarUrl } from "@/lib/profile";
 import { SignOutButton } from "@/components/sign-out-button";
 import { Logo } from "@/components/ui/logo";
 import { NavLink } from "@/components/ui/nav-link";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { buttonClass } from "@/components/ui/button";
 
 export async function SiteHeader() {
@@ -46,6 +47,7 @@ export async function SiteHeader() {
         </div>
 
         <nav className="flex items-center gap-2">
+          <ThemeToggle />
           {user ? (
             <>
               <Link href="/new" className={buttonClass({ size: "sm" })}>

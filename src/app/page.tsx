@@ -33,7 +33,7 @@ export default async function Home() {
         <h1 className="mt-4 text-display-l text-fg sm:text-display-xl">
           The things you build with AI deserve a home.
         </h1>
-        <p className="mt-6 max-w-xl text-body text-fg-muted sm:text-lg">
+        <p className="mt-6 max-w-xl text-title font-normal text-fg-muted">
           Publish interactive artifacts, live and running. Build a portfolio
           under your own name. See what everyone else is making.
         </p>
