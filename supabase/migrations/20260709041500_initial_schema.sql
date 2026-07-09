@@ -47,7 +47,9 @@ create trigger profiles_set_updated_at
 
 create table public.artifacts (
   id uuid primary key default gen_random_uuid(),
-  owner_id uuid not null references auth.users (id) on delete cascade,
+  -- References profiles (not auth.users) so PostgREST can join artifacts to
+  -- creator display data; onboarding guarantees a profile exists first.
+  owner_id uuid not null references public.profiles (user_id) on delete cascade,
   title text not null check (char_length(title) between 1 and 120),
   description text check (char_length(description) <= 500),
   tags text[] not null default '{}',
@@ -83,7 +85,7 @@ create trigger artifacts_set_updated_at
 create table public.comments (
   id uuid primary key default gen_random_uuid(),
   artifact_id uuid not null references public.artifacts (id) on delete cascade,
-  author_id uuid not null references auth.users (id) on delete cascade,
+  author_id uuid not null references public.profiles (user_id) on delete cascade,
   body text not null check (char_length(body) between 1 and 1000),
   status text not null default 'visible'
     check (status in ('visible', 'removed')),
@@ -97,8 +99,8 @@ create index comments_artifact_idx on public.comments (artifact_id, created_at);
 -- ---------------------------------------------------------------------------
 
 create table public.follows (
-  follower_id uuid not null references auth.users (id) on delete cascade,
-  followee_id uuid not null references auth.users (id) on delete cascade,
+  follower_id uuid not null references public.profiles (user_id) on delete cascade,
+  followee_id uuid not null references public.profiles (user_id) on delete cascade,
   created_at timestamptz not null default now(),
   primary key (follower_id, followee_id),
   check (follower_id <> followee_id)
@@ -107,7 +109,7 @@ create table public.follows (
 create index follows_followee_idx on public.follows (followee_id);
 
 create table public.likes (
-  user_id uuid not null references auth.users (id) on delete cascade,
+  user_id uuid not null references public.profiles (user_id) on delete cascade,
   artifact_id uuid not null references public.artifacts (id) on delete cascade,
   created_at timestamptz not null default now(),
   primary key (user_id, artifact_id)
