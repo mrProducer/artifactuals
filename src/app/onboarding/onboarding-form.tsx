@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import { createProfile, type OnboardingState } from "./actions";
+import { inputClass } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function OnboardingForm({
   defaultDisplayName = "",
@@ -15,15 +17,12 @@ export function OnboardingForm({
     null
   );
 
-  const inputClass =
-    "w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400";
-
   return (
     <form action={formAction} className="mt-8 flex flex-col gap-4">
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
         Username
         <div className="flex items-center gap-0">
-          <span className="border border-r-0 border-zinc-300 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">
+          <span className="border border-r-0 border-border bg-surface-muted px-3 py-2.5 font-mono text-meta text-fg-muted">
             artifactuals.com/
           </span>
           <input
@@ -41,7 +40,7 @@ export function OnboardingForm({
         </div>
       </label>
 
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
         Display name
         <input
           name="display_name"
@@ -53,17 +52,11 @@ export function OnboardingForm({
         />
       </label>
 
-      {state?.error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>
-      )}
+      {state?.error && <p className="text-small text-danger">{state.error}</p>}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-2 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-      >
+      <Button type="submit" disabled={pending} className="mt-2 self-start">
         {pending ? "Creating..." : "Create profile"}
-      </button>
+      </Button>
     </form>
   );
 }

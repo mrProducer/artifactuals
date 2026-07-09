@@ -39,10 +39,8 @@ export default async function OnboardingPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-12">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Set up your profile
-      </h1>
-      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+      <h1 className="text-h1 text-fg">Set up your profile</h1>
+      <p className="mt-1 text-body text-fg-muted">
         Pick a username — it becomes your public URL.
       </p>
       <OnboardingForm

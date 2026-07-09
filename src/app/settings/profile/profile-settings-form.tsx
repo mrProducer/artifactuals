@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { updateProfile, type SettingsState } from "./actions";
+import { inputClass } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type ProfileData = {
   username: string;
@@ -15,9 +17,6 @@ type ProfileData = {
   custom_links: { label: string; url: string }[];
 };
 
-const inputClass =
-  "w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400";
-
 export function ProfileSettingsForm({ profile }: { profile: ProfileData }) {
   const [state, formAction, pending] = useActionState<SettingsState, FormData>(
     updateProfile,
@@ -26,7 +25,7 @@ export function ProfileSettingsForm({ profile }: { profile: ProfileData }) {
 
   return (
     <form action={formAction} className="mt-8 flex flex-col gap-5">
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
         Display name
         <input
           name="display_name"
@@ -37,7 +36,7 @@ export function ProfileSettingsForm({ profile }: { profile: ProfileData }) {
         />
       </label>
 
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
         Bio
         <textarea
           name="bio"
@@ -49,23 +48,23 @@ export function ProfileSettingsForm({ profile }: { profile: ProfileData }) {
         />
       </label>
 
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
         Photo
         <input
           type="file"
           name="avatar"
           accept="image/png,image/jpeg,image/webp"
-          className="text-sm text-zinc-500 file:mr-3 file:border-0 file:bg-zinc-100 file:px-3 file:py-2 file:text-sm file:font-medium dark:file:bg-zinc-800 dark:file:text-zinc-200"
+          className="text-small text-fg-muted file:mr-3 file:border-0 file:bg-surface-muted file:px-3 file:py-2 file:text-small file:font-medium file:text-fg-muted"
         />
-        <span className="text-xs font-normal text-zinc-400">
+        <span className="text-meta font-normal text-fg-subtle">
           PNG, JPEG, or WebP up to 2 MB. Leave empty to keep your current
           photo.
         </span>
       </label>
 
-      <hr className="border-zinc-200 dark:border-zinc-800" />
+      <hr className="border-border" />
 
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
         GitHub username
         <input
           name="github_username"
@@ -74,12 +73,12 @@ export function ProfileSettingsForm({ profile }: { profile: ProfileData }) {
           autoCapitalize="none"
           className={inputClass}
         />
-        <span className="text-xs font-normal text-zinc-400">
+        <span className="text-meta font-normal text-fg-subtle">
           We&apos;ll show your public GitHub activity on your profile.
         </span>
       </label>
 
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
         LinkedIn URL
         <input
           name="linkedin_url"
@@ -89,7 +88,7 @@ export function ProfileSettingsForm({ profile }: { profile: ProfileData }) {
         />
       </label>
 
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
         Instagram URL
         <input
           name="instagram_url"
@@ -100,7 +99,7 @@ export function ProfileSettingsForm({ profile }: { profile: ProfileData }) {
       </label>
 
       <fieldset className="flex flex-col gap-3">
-        <legend className="mb-1 text-sm font-medium">
+        <legend className="mb-1 text-small font-medium text-fg">
           Custom links (up to 2)
         </legend>
         {[0, 1].map((i) => (
@@ -123,24 +122,20 @@ export function ProfileSettingsForm({ profile }: { profile: ProfileData }) {
       </fieldset>
 
       {state && "error" in state && (
-        <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>
+        <p className="text-small text-danger">{state.error}</p>
       )}
       {state && "success" in state && (
-        <p className="text-sm text-emerald-600 dark:text-emerald-400">
+        <p className="text-small text-fg">
           Saved.{" "}
-          <Link href={`/${profile.username}`} className="underline">
+          <Link href={`/${profile.username}`} className="text-accent underline">
             View your profile
           </Link>
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-      >
+      <Button type="submit" disabled={pending} className="self-start">
         {pending ? "Saving..." : "Save changes"}
-      </button>
+      </Button>
     </form>
   );
 }

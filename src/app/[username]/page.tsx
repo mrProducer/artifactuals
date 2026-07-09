@@ -7,6 +7,8 @@ import { ArtifactFrame } from "@/components/artifact-frame";
 import { resolveAvatarUrl } from "@/lib/profile";
 import { FollowButton } from "@/components/follow-button";
 import { fetchGitHubProfile } from "@/lib/github";
+import { buttonClass } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 type Props = { params: Promise<{ username: string }> };
 
@@ -106,29 +108,27 @@ export default async function ProfilePage({ params }: Props) {
         />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {profile.display_name}
-            </h1>
-            <span className="text-zinc-400 dark:text-zinc-500">
+            <h1 className="text-h1 text-fg">{profile.display_name}</h1>
+            <span className="font-mono text-meta text-fg-subtle">
               @{profile.username}
             </span>
           </div>
 
           {profile.bio && (
-            <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            <p className="mt-2 max-w-[68ch] text-body text-fg-muted">
               {profile.bio}
             </p>
           )}
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-meta text-fg-muted">
             <span>
-              <strong className="font-semibold text-zinc-900 dark:text-zinc-100">
+              <strong className="font-semibold text-fg">
                 {followerCount ?? 0}
               </strong>{" "}
               followers
             </span>
             <span>
-              <strong className="font-semibold text-zinc-900 dark:text-zinc-100">
+              <strong className="font-semibold text-fg">
                 {followingCount ?? 0}
               </strong>{" "}
               following
@@ -143,7 +143,7 @@ export default async function ProfilePage({ params }: Props) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 hover:border-zinc-400 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-600"
+                  className="border border-border bg-surface px-3 py-1 text-small font-medium text-fg-muted transition-colors hover:border-border-strong hover:text-fg"
                 >
                   {link.label}
                 </a>
@@ -155,7 +155,7 @@ export default async function ProfilePage({ params }: Props) {
         {isOwner ? (
           <Link
             href="/settings/profile"
-            className="self-start border border-zinc-300 px-4 py-1.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            className={buttonClass({ variant: "secondary", size: "sm", className: "self-start" })}
           >
             Edit profile
           </Link>
@@ -173,8 +173,8 @@ export default async function ProfilePage({ params }: Props) {
 
       {/* GitHub highlights */}
       {github && github.repos.length > 0 && (
-        <section className="mt-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
+        <section className="mt-12">
+          <h2 className="font-mono text-label uppercase text-fg-subtle">
             Recent on GitHub
           </h2>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -184,18 +184,18 @@ export default async function ProfilePage({ params }: Props) {
                 href={repo.html_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-zinc-200 p-4 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+                className="border border-border bg-surface p-4 shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-sm font-medium">
+                  <span className="truncate text-title text-fg">
                     {repo.name}
                   </span>
-                  <span className="shrink-0 text-xs text-zinc-400">
+                  <span className="shrink-0 font-mono text-meta text-fg-subtle">
                     ★ {repo.stargazers_count}
                   </span>
                 </div>
                 {repo.description && (
-                  <p className="mt-1 line-clamp-2 text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-1 line-clamp-2 text-small text-fg-muted">
                     {repo.description}
                   </p>
                 )}
@@ -206,8 +206,8 @@ export default async function ProfilePage({ params }: Props) {
       )}
 
       {/* Artifacts */}
-      <section className="mt-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
+      <section className="mt-12">
+        <h2 className="font-mono text-label uppercase text-fg-subtle">
           Artifacts
         </h2>
         {artifacts && artifacts.length > 0 ? (
@@ -216,36 +216,32 @@ export default async function ProfilePage({ params }: Props) {
               <Link
                 key={artifact.id}
                 href={`/a/${artifact.id}`}
-                className="group overflow-hidden border border-zinc-200 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+                className="group overflow-hidden border border-border bg-surface shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md"
               >
-                <div className="aspect-[1200/630] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                <div className="aspect-[1200/630] overflow-hidden bg-surface-muted">
                   {artifact.preview_image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={artifact.preview_image_url}
                       alt={artifact.title}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover transition-transform duration-[320ms] ease-out group-hover:scale-[1.02]"
                     />
                   ) : (
                     <ArtifactFrame
                       src={`/sandbox/a/${artifact.id}`}
                       title={artifact.title}
-                      className="pointer-events-none h-full w-full border-0 bg-white"
+                      className="pointer-events-none h-full w-full border-0 bg-surface"
                     />
                   )}
                 </div>
                 <div className="p-3">
                   <div className="flex items-center gap-2">
-                    {artifact.is_pinned && (
-                      <span className="bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-700 dark:bg-amber-950 dark:text-amber-400">
-                        Pinned
-                      </span>
-                    )}
-                    <span className="truncate text-sm font-medium">
+                    {artifact.is_pinned && <Badge variant="pinned">Pinned</Badge>}
+                    <span className="truncate text-title text-fg">
                       {artifact.title}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                  <p className="mt-1 font-mono text-meta text-fg-subtle">
                     {artifact.like_count} likes · {artifact.comment_count}{" "}
                     comments
                   </p>
@@ -254,17 +250,14 @@ export default async function ProfilePage({ params }: Props) {
             ))}
           </div>
         ) : (
-          <div className="mt-3 flex flex-col items-center gap-4 border border-dashed border-zinc-300 p-8 text-center dark:border-zinc-700">
-            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+          <div className="mt-3 flex flex-col items-center gap-4 border border-dashed border-border bg-surface p-10 text-center">
+            <p className="font-mono text-label uppercase text-fg-subtle">
               {isOwner
-                ? "You haven't published anything yet."
-                : `${profile.display_name} hasn't published anything yet.`}
+                ? "Nothing on the wall yet"
+                : `${profile.display_name} hasn't published anything yet`}
             </p>
             {isOwner && (
-              <Link
-                href="/new"
-                className="border border-zinc-950 bg-zinc-950 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 active:translate-y-px dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-300"
-              >
+              <Link href="/new" className={buttonClass({ size: "sm" })}>
                 Publish your first artifact
               </Link>
             )}

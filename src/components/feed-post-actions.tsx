@@ -13,7 +13,7 @@ import { toggleLike } from "@/app/actions/social";
 const ICON_SIZE = 22;
 
 const actionClass =
-  "flex items-center gap-1.5 px-2 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.96] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50";
+  "flex items-center gap-1.5 px-2 py-1.5 text-small font-medium text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg active:scale-[0.96]";
 
 export function FeedPostActions({
   artifactId,
@@ -33,6 +33,7 @@ export function FeedPostActions({
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [shared, setShared] = useState(false);
+  const [popKey, setPopKey] = useState(0);
   const [, startTransition] = useTransition();
 
   function handleLike() {
@@ -42,6 +43,8 @@ export function FeedPostActions({
     }
     const wasLiked = liked;
     setLiked(!wasLiked);
+    // Replay the scale-pop by remounting the icon (DESIGN.md §6).
+    if (!wasLiked) setPopKey((k) => k + 1);
     setLikeCount((c) => c + (wasLiked ? -1 : 1));
     startTransition(async () => {
       const { error } = await toggleLike(artifactId, wasLiked);
@@ -70,23 +73,33 @@ export function FeedPostActions({
   return (
     <div className="flex items-center justify-between px-2.5 py-1.5">
       <div className="flex items-center gap-1">
-        <button onClick={handleLike} aria-pressed={liked} className={actionClass}>
+        <button
+          onClick={handleLike}
+          aria-pressed={liked}
+          aria-label={liked ? "Unlike" : "Like"}
+          className={actionClass}
+        >
           <Heart
+            key={popKey}
             size={ICON_SIZE}
             weight={liked ? "fill" : "regular"}
-            className={liked ? "text-rose-500" : undefined}
+            className={liked ? "animate-like-pop text-like" : undefined}
           />
           {likeCount > 0 && <span>{likeCount}</span>}
         </button>
 
-        <Link href={`/a/${artifactId}#comments`} className={actionClass}>
+        <Link
+          href={`/a/${artifactId}#comments`}
+          aria-label="Comments"
+          className={actionClass}
+        >
           <ChatCircle size={ICON_SIZE} />
           {commentCount > 0 && <span>{commentCount}</span>}
         </Link>
 
-        <button onClick={handleShare} className={actionClass}>
+        <button onClick={handleShare} aria-label="Share" className={actionClass}>
           <PaperPlaneTilt size={ICON_SIZE} />
-          {shared && <span className="text-xs">Copied</span>}
+          {shared && <span className="text-meta">Copied</span>}
         </button>
       </div>
 

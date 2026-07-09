@@ -26,8 +26,8 @@ export default async function ProfileSettingsPage() {
 
   return (
     <main className="mx-auto w-full max-w-lg flex-1 px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Edit profile</h1>
-      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+      <h1 className="text-h1 text-fg">Edit profile</h1>
+      <p className="mt-1 font-mono text-meta text-fg-muted">
         Public info shown at artifactuals.com/{profile.username}
       </p>
       <ProfileSettingsForm

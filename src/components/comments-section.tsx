@@ -6,6 +6,8 @@ import { addComment, deleteComment } from "@/app/actions/social";
 import { Avatar } from "@/components/avatar";
 import { resolveAvatarUrl } from "@/lib/profile";
 import { ReportButton } from "@/components/report-button";
+import { inputClass } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export type CommentItem = {
   id: string;
@@ -48,8 +50,8 @@ export function CommentsSection({
   }
 
   return (
-    <section id="comments" className="mt-8">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
+    <section id="comments" className="mt-12">
+      <h2 className="font-mono text-label uppercase text-fg-subtle">
         Comments ({comments.length})
       </h2>
 
@@ -65,22 +67,16 @@ export function CommentsSection({
             maxLength={1000}
             rows={2}
             placeholder="Say something about this artifact..."
-            className="w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400"
+            className={inputClass}
           />
-          {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-          )}
-          <button
-            type="submit"
-            disabled={pending}
-            className="self-end bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
-          >
+          {error && <p className="text-small text-danger">{error}</p>}
+          <Button type="submit" size="sm" disabled={pending} className="self-end">
             {pending ? "Posting..." : "Comment"}
-          </button>
+          </Button>
         </form>
       ) : (
-        <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-          <Link href="/login" className="underline">
+        <p className="mt-3 text-body text-fg-muted">
+          <Link href="/login" className="text-accent underline">
             Sign in
           </Link>{" "}
           to join the conversation.
@@ -102,16 +98,16 @@ export function CommentsSection({
                 {comment.profiles && (
                   <Link
                     href={`/${comment.profiles.username}`}
-                    className="text-sm font-medium"
+                    className="text-title text-fg hover:underline"
                   >
                     {comment.profiles.display_name}
                   </Link>
                 )}
-                <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                <span className="font-mono text-meta text-fg-subtle">
                   {new Date(comment.created_at).toLocaleDateString()}
                 </span>
               </div>
-              <p className="mt-0.5 whitespace-pre-wrap break-words text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+              <p className="mt-0.5 whitespace-pre-wrap break-words text-body text-fg">
                 {comment.body}
               </p>
               <div className="mt-1 flex items-center gap-3">
@@ -122,7 +118,7 @@ export function CommentsSection({
                         await deleteComment(comment.id, artifactId);
                       })
                     }
-                    className="text-xs text-zinc-400 hover:text-red-600 dark:text-zinc-500"
+                    className="text-meta text-fg-subtle transition-colors hover:text-danger"
                   >
                     Delete
                   </button>

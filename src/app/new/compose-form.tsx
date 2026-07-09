@@ -4,9 +4,8 @@ import { useActionState, useRef, useState } from "react";
 import { ArtifactFrame } from "@/components/artifact-frame";
 import { publishArtifact, uploadDraft } from "./actions";
 import { ARTIFACT_TAGS, type PublishState } from "./constants";
-
-const inputClass =
-  "w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400";
+import { inputClass } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function ComposeForm({ userId }: { userId: string }) {
   const [state, formAction, pending] = useActionState<PublishState, FormData>(
@@ -51,32 +50,30 @@ export function ComposeForm({ userId }: { userId: string }) {
   }
 
   const previewPane = (
-    <div className="flex h-full min-h-[320px] flex-col overflow-hidden border border-zinc-200 dark:border-zinc-800">
-      <div className="flex items-center justify-between border-b border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
-        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-          Preview — exactly how your published artifact will run
+    <div className="flex h-full min-h-[320px] flex-col overflow-hidden border border-border shadow-sm">
+      <div className="flex items-center justify-between gap-2 border-b border-border bg-surface-muted px-3 py-2">
+        <span className="font-mono text-label uppercase text-fg-subtle">
+          Preview
         </span>
-        <button
+        <Button
           type="button"
+          size="sm"
           onClick={() => updatePreview()}
           disabled={previewLoading || !html.trim()}
-          className="bg-zinc-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
         >
           {previewLoading ? "Loading..." : "Update preview"}
-        </button>
+        </Button>
       </div>
       {previewError ? (
-        <p className="p-4 text-sm text-red-600 dark:text-red-400">
-          {previewError}
-        </p>
+        <p className="p-4 text-small text-danger">{previewError}</p>
       ) : previewSrc ? (
         <ArtifactFrame
           src={previewSrc}
           title="Artifact preview"
-          className="min-h-[320px] w-full flex-1 border-0 bg-white"
+          className="min-h-[320px] w-full flex-1 border-0 bg-surface"
         />
       ) : (
-        <p className="flex flex-1 items-center justify-center p-4 text-sm text-zinc-400 dark:text-zinc-500">
+        <p className="flex flex-1 items-center justify-center p-4 text-center font-mono text-meta text-fg-subtle">
           Paste or upload HTML, then hit “Update preview”.
         </p>
       )}
@@ -90,15 +87,15 @@ export function ComposeForm({ userId }: { userId: string }) {
         onChange={(e) => setHtml(e.target.value)}
         placeholder="<!DOCTYPE html>..."
         spellCheck={false}
-        className={`${inputClass} min-h-[320px] flex-1 resize-y font-mono text-xs leading-5`}
+        className={`${inputClass} min-h-[320px] flex-1 resize-y font-mono text-small leading-5`}
       />
-      <label className="text-sm text-zinc-500 dark:text-zinc-400">
+      <label className="text-small text-fg-muted">
         or upload a file:{" "}
         <input
           type="file"
           accept=".html,text/html"
           onChange={handleFileUpload}
-          className="text-sm file:mr-2 file:file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-xs file:font-medium dark:file:bg-zinc-800 dark:file:text-zinc-200"
+          className="text-small file:mr-2 file:border-0 file:bg-surface-muted file:px-3 file:py-1.5 file:text-meta file:font-medium file:text-fg-muted"
         />
       </label>
     </div>
@@ -117,10 +114,10 @@ export function ComposeForm({ userId }: { userId: string }) {
             onClick={() =>
               tab === "preview" ? updatePreview("preview") : setMobileTab(tab)
             }
-            className={`px-4 py-1.5 text-sm font-medium capitalize ${
+            className={`h-9 px-4 text-small font-medium capitalize transition-colors ${
               mobileTab === tab
-                ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                : "border border-zinc-300 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400"
+                ? "bg-accent text-accent-fg"
+                : "border border-border text-fg-muted hover:border-border-strong"
             }`}
           >
             {tab}
@@ -138,11 +135,11 @@ export function ComposeForm({ userId }: { userId: string }) {
 
       {/* Metadata */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1.5 text-sm font-medium">
+        <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
           Title
           <input name="title" required maxLength={120} className={inputClass} />
         </label>
-        <label className="flex flex-col gap-1.5 text-sm font-medium sm:col-span-2 sm:col-start-1">
+        <label className="flex flex-col gap-1.5 text-small font-medium text-fg sm:col-span-2 sm:col-start-1">
           Description
           <textarea
             name="description"
@@ -155,12 +152,12 @@ export function ComposeForm({ userId }: { userId: string }) {
       </div>
 
       <fieldset>
-        <legend className="mb-2 text-sm font-medium">Tags</legend>
+        <legend className="mb-2 text-small font-medium text-fg">Tags</legend>
         <div className="flex flex-wrap gap-2">
           {ARTIFACT_TAGS.map((tag) => (
             <label
               key={tag}
-              className="flex cursor-pointer items-center gap-1.5 border border-zinc-300 px-3 py-1.5 text-sm has-checked:border-zinc-900 has-checked:bg-zinc-900 has-checked:text-white dark:border-zinc-700 dark:has-checked:border-zinc-100 dark:has-checked:bg-zinc-100 dark:has-checked:text-zinc-900"
+              className="flex cursor-pointer items-center gap-1.5 border border-border px-3 py-1.5 text-small text-fg-muted transition-colors has-checked:border-accent has-checked:bg-accent has-checked:text-accent-fg"
             >
               <input
                 type="checkbox"
@@ -174,17 +171,15 @@ export function ComposeForm({ userId }: { userId: string }) {
         </div>
       </fieldset>
 
-      {state?.error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>
-      )}
+      {state?.error && <p className="text-small text-danger">{state.error}</p>}
 
-      <button
+      <Button
         type="submit"
         disabled={pending || !html.trim()}
-        className="self-start bg-zinc-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        className="self-start"
       >
         {pending ? "Publishing..." : "Publish"}
-      </button>
+      </Button>
     </form>
   );
 }

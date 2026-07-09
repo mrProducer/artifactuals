@@ -26,17 +26,22 @@ export function FeedPost({
   artifact,
   likedByViewer,
   signedIn,
+  index = 0,
 }: {
   artifact: FeedArtifact;
   likedByViewer: boolean;
   signedIn: boolean;
+  index?: number;
 }) {
   const creator = artifact.profiles;
 
   return (
-    <article className="border-y border-zinc-200 bg-white sm:border-x dark:border-zinc-800 dark:bg-zinc-900">
-      {/* Creator header (LinkedIn-style: photo, name, headline, time) */}
-      <div className="flex items-start gap-3 px-4 pt-4 pb-3">
+    <article
+      style={{ "--enter-index": index } as React.CSSProperties}
+      className="group animate-rise border-y border-border bg-surface shadow-sm transition-[transform,box-shadow] duration-200 ease-out sm:border-x hover:-translate-y-0.5 hover:shadow-md"
+    >
+      {/* Creator header (LinkedIn-style: photo, name, handle, time) */}
+      <div className="flex items-start gap-3 px-4 pt-4 pb-3 sm:px-5">
         {creator && (
           <>
             <Link href={`/${creator.username}`} className="shrink-0">
@@ -49,14 +54,19 @@ export function FeedPost({
             <div className="min-w-0 flex-1">
               <Link
                 href={`/${creator.username}`}
-                className="block truncate text-sm font-semibold leading-5 text-zinc-900 hover:underline dark:text-zinc-50"
+                className="block truncate text-title text-fg hover:underline"
               >
                 {creator.display_name}
               </Link>
-              <p className="truncate text-xs leading-4 text-zinc-500 dark:text-zinc-400">
-                {creator.bio ?? `@${creator.username}`}
+              <p className="truncate font-mono text-meta text-fg-muted">
+                @{creator.username}
               </p>
-              <p className="text-xs leading-4 text-zinc-400 dark:text-zinc-500">
+              {creator.bio && (
+                <p className="truncate text-small text-fg-muted">
+                  {creator.bio}
+                </p>
+              )}
+              <p className="font-mono text-meta text-fg-subtle">
                 {timeAgo(artifact.created_at)}
               </p>
             </div>
@@ -65,13 +75,13 @@ export function FeedPost({
       </div>
 
       {/* Caption */}
-      <div className="px-4 pb-3">
-        <Link href={`/a/${artifact.id}`} className="group block">
-          <h2 className="text-[15px] font-semibold leading-snug text-zinc-900 group-hover:underline dark:text-zinc-50">
+      <div className="px-4 pb-3 sm:px-5">
+        <Link href={`/a/${artifact.id}`} className="block">
+          <h2 className="text-title text-fg hover:underline">
             {artifact.title}
           </h2>
           {artifact.description && (
-            <p className="mt-0.5 line-clamp-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            <p className="mt-0.5 line-clamp-2 text-body text-fg-muted">
               {artifact.description}
             </p>
           )}
@@ -80,20 +90,20 @@ export function FeedPost({
 
       {/* Media: a generated screenshot once it exists, otherwise the live
           artifact itself (non-interactive) so the feed is never empty. */}
-      <div className="relative aspect-[1200/630] w-full overflow-hidden border-y border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="relative aspect-[1200/630] w-full overflow-hidden border-y border-border bg-surface-muted">
         {artifact.preview_image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={artifact.preview_image_url}
             alt={artifact.title}
             loading="lazy"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-[320ms] ease-out group-hover:scale-[1.02]"
           />
         ) : (
           <ArtifactFrame
             src={`/sandbox/a/${artifact.id}`}
             title={artifact.title}
-            className="pointer-events-none h-full w-full border-0 bg-white"
+            className="pointer-events-none h-full w-full border-0 bg-surface"
           />
         )}
         {/* Transparent overlay makes the whole media open the artifact

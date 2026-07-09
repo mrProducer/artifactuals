@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { FeedPost, type FeedArtifact } from "@/components/feed-post";
+import { buttonClass } from "@/components/ui/button";
 
 export const metadata = { title: "Feed" };
 
@@ -70,17 +71,17 @@ export default async function FeedPage({ searchParams }: Props) {
   }
 
   const tabClass = (selected: boolean) =>
-    `border-b-2 px-1 pb-2.5 text-sm font-semibold transition-colors ${
+    `-mb-px border-b-2 px-1 pb-2.5 text-small font-semibold transition-colors ${
       selected
-        ? "border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-50"
-        : "border-transparent text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+        ? "border-accent text-fg"
+        : "border-transparent text-fg-subtle hover:text-fg"
     }`;
 
   return (
-    <div className="flex-1 bg-zinc-100 dark:bg-zinc-950">
-      <main className="mx-auto w-full max-w-[600px] pb-16">
+    <div className="flex-1 bg-bg">
+      <main className="mx-auto w-full max-w-[600px] px-0 pb-16 sm:px-6">
         {/* Tabs */}
-        <div className="flex items-end gap-6 border-b border-zinc-200 bg-white px-4 pt-3 sm:mt-6 sm:border-x sm:border-t dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-end gap-6 border-b border-border bg-surface px-4 pt-3 shadow-sm sm:mt-6 sm:border-x sm:border-t">
           <Link href="/feed" className={tabClass(activeTab === "trending")}>
             Trending
           </Link>
@@ -95,7 +96,7 @@ export default async function FeedPage({ searchParams }: Props) {
         </div>
 
         {requestedTab === "following" && followeeIds.length === 0 && (
-          <p className="border-b border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-500 sm:border-x dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+          <p className="border-b border-border bg-surface px-4 py-3 text-small text-fg-muted sm:border-x">
             You aren&apos;t following anyone yet, so here&apos;s what&apos;s
             trending.
           </p>
@@ -103,26 +104,24 @@ export default async function FeedPage({ searchParams }: Props) {
 
         {artifacts.length > 0 ? (
           <div className="flex flex-col gap-3 pt-3 sm:gap-4 sm:pt-4">
-            {artifacts.map((artifact) => (
+            {artifacts.map((artifact, i) => (
               <FeedPost
                 key={artifact.id}
                 artifact={artifact}
                 likedByViewer={likedIds.has(artifact.id)}
                 signedIn={user !== null}
+                index={i}
               />
             ))}
           </div>
         ) : (
-          <div className="border-b border-zinc-200 bg-white px-4 py-16 text-center sm:border-x dark:border-zinc-800 dark:bg-zinc-900">
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Nothing here yet.{" "}
-              <Link
-                href="/new"
-                className="font-semibold text-zinc-900 hover:underline dark:text-zinc-100"
-              >
-                Publish the first artifact
-              </Link>
+          <div className="mt-3 flex flex-col items-center gap-4 border border-dashed border-border bg-surface px-4 py-16 text-center sm:mx-0">
+            <p className="font-mono text-label uppercase text-fg-subtle">
+              Nothing on the wall yet
             </p>
+            <Link href="/new" className={buttonClass({ size: "sm" })}>
+              Publish the first artifact
+            </Link>
           </div>
         )}
       </main>

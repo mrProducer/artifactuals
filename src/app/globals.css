@@ -1,26 +1,205 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------ *
+ * Artifactuals design system — "The Quiet Gallery" (see docs/DESIGN.md)
+ * Tokens are law: components consume these semantic variables, never
+ * literal zinc or hex values. Retheming (incl. dark mode) happens here.
+ * ------------------------------------------------------------------ */
+
+/* ---- Base tokens (light) ---- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: oklch(0.985 0.003 95);
+  --surface: oklch(1 0 0);
+  --surface-muted: oklch(0.965 0.003 95);
+  --border: oklch(0.905 0.004 95);
+  --border-strong: oklch(0.82 0.004 95);
+  --fg: oklch(0.22 0.006 95);
+  --fg-muted: oklch(0.5 0.006 95);
+  --fg-subtle: oklch(0.63 0.006 95);
+  /* Monochrome by default: "accent" is ink. To enable a warm accent
+     (DESIGN.md §3.3), swap only these three values (and their dark twins). */
+  --accent: oklch(0.22 0.006 95);
+  --accent-hover: oklch(0.36 0.006 95);
+  --accent-fg: oklch(0.985 0.003 95);
+  --like: oklch(0.63 0.22 15);
+  --highlight: oklch(0.8 0.14 80);
+  --danger: oklch(0.58 0.22 25);
+
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.05), 0 1px 1px oklch(0 0 0 / 0.04);
+  --shadow-md: 0 6px 24px -8px oklch(0 0 0 / 0.14),
+    0 2px 6px -2px oklch(0 0 0 / 0.08);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* ---- Dark overrides ---- */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --bg: oklch(0.165 0.005 285);
+    --surface: oklch(0.205 0.005 285);
+    --surface-muted: oklch(0.245 0.005 285);
+    --border: oklch(0.29 0.006 285);
+    --border-strong: oklch(0.4 0.006 285);
+    --fg: oklch(0.95 0.004 285);
+    --fg-muted: oklch(0.72 0.005 285);
+    --fg-subtle: oklch(0.58 0.005 285);
+    --accent: oklch(0.95 0.004 285);
+    --accent-hover: oklch(0.82 0.005 285);
+    --accent-fg: oklch(0.165 0.005 285);
+    --like: oklch(0.7 0.19 15);
+    --highlight: oklch(0.82 0.13 80);
+    --danger: oklch(0.68 0.19 25);
+    /* On dark, shadows do almost nothing; borders carry separation. */
+    --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
+    --shadow-md: 0 8px 28px -10px oklch(0 0 0 / 0.55);
   }
 }
 
+/* Explicit opt-in dark (mirrors the block above) for a future toggle. */
+:root[data-theme="dark"] {
+  --bg: oklch(0.165 0.005 285);
+  --surface: oklch(0.205 0.005 285);
+  --surface-muted: oklch(0.245 0.005 285);
+  --border: oklch(0.29 0.006 285);
+  --border-strong: oklch(0.4 0.006 285);
+  --fg: oklch(0.95 0.004 285);
+  --fg-muted: oklch(0.72 0.005 285);
+  --fg-subtle: oklch(0.58 0.005 285);
+  --accent: oklch(0.95 0.004 285);
+  --accent-hover: oklch(0.82 0.005 285);
+  --accent-fg: oklch(0.165 0.005 285);
+  --like: oklch(0.7 0.19 15);
+  --highlight: oklch(0.82 0.13 80);
+  --danger: oklch(0.68 0.19 25);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
+  --shadow-md: 0 8px 28px -10px oklch(0 0 0 / 0.55);
+}
+
+/* ---- Expose tokens to Tailwind utilities ---- */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-like: var(--like);
+  --color-highlight: var(--highlight);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Type scale (DESIGN.md §4.1). Line-height/tracking/weight travel with
+     each size so `text-h1` etc. carry the full editorial treatment. */
+  --text-display-xl: 4.25rem;
+  --text-display-xl--line-height: 1.02;
+  --text-display-xl--letter-spacing: -0.03em;
+  --text-display-xl--font-weight: 600;
+
+  --text-display-l: 3rem;
+  --text-display-l--line-height: 1.05;
+  --text-display-l--letter-spacing: -0.025em;
+  --text-display-l--font-weight: 600;
+
+  --text-h1: 2rem;
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h1--font-weight: 600;
+
+  --text-h2: 1.5rem;
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h2--font-weight: 600;
+
+  --text-title: 1.0625rem;
+  --text-title--line-height: 1.35;
+  --text-title--letter-spacing: -0.01em;
+  --text-title--font-weight: 600;
+
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.6;
+  --text-body--font-weight: 400;
+
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.5;
+  --text-small--font-weight: 400;
+
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.09em;
+  --text-label--font-weight: 600;
+
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1.4;
+  --text-meta--letter-spacing: 0.01em;
+  --text-meta--font-weight: 500;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  /* No more Arial — inherit the Geist stack via --font-sans. */
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Global focus ring — accessibility floor for every interactive element. */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- Motion utilities (DESIGN.md §6) ---- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes like-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Feed entrance: fade + rise, staggered by --enter-index on first paint. */
+.animate-rise {
+  animation: rise 320ms var(--ease-out, ease-out) both;
+  animation-delay: calc(var(--enter-index, 0) * 40ms);
+}
+
+.animate-like-pop {
+  animation: like-pop 260ms var(--ease-out, ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

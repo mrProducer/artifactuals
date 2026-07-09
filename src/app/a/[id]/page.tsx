@@ -10,6 +10,7 @@ import { ShareButtons } from "@/components/share-buttons";
 import { ReportButton } from "@/components/report-button";
 import { CommentsSection, type CommentItem } from "@/components/comments-section";
 import { sandboxBaseUrl } from "@/lib/sandbox";
+import { Badge } from "@/components/ui/badge";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -102,11 +103,9 @@ export default async function ArtifactPage({ params }: Props) {
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-6 sm:px-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {artifact.title}
-          </h1>
+          <h1 className="text-h1 text-fg">{artifact.title}</h1>
           {artifact.description && (
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1 max-w-[68ch] text-body text-fg-muted">
               {artifact.description}
             </p>
           )}
@@ -120,10 +119,10 @@ export default async function ArtifactPage({ params }: Props) {
                 imageUrl={resolveAvatarUrl(creator)}
                 size="sm"
               />
-              <span className="text-sm font-medium">
+              <span className="text-small font-medium text-fg">
                 {creator.display_name}
               </span>
-              <span className="text-sm text-zinc-400">
+              <span className="font-mono text-meta text-fg-subtle">
                 @{creator.username}
               </span>
             </Link>
@@ -137,7 +136,7 @@ export default async function ArtifactPage({ params }: Props) {
             initialCount={artifact.like_count}
             signedIn={user !== null}
           />
-          <span className="text-sm text-zinc-400 dark:text-zinc-500">
+          <span className="font-mono text-meta text-fg-subtle">
             {artifact.view_count} views
           </span>
         </div>
@@ -146,12 +145,7 @@ export default async function ArtifactPage({ params }: Props) {
       {artifact.tags.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
           {artifact.tags.map((tag) => (
-            <span
-              key={tag}
-              className="bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
-            >
-              {tag}
-            </span>
+            <Badge key={tag}>{tag}</Badge>
           ))}
         </div>
       )}

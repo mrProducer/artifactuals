@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { reportContent } from "@/app/actions/social";
+import { inputClass } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function ReportButton({
   targetType,
@@ -20,7 +22,7 @@ export function ReportButton({
 
   if (done) {
     return (
-      <span className="text-xs text-zinc-400 dark:text-zinc-500">
+      <span className="font-mono text-meta text-fg-subtle">
         Reported — thank you.
       </span>
     );
@@ -36,7 +38,7 @@ export function ReportButton({
           }
           setOpen(true);
         }}
-        className="text-xs text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
+        className="text-meta text-fg-subtle transition-colors hover:text-fg"
       >
         Report
       </button>
@@ -65,23 +67,17 @@ export function ReportButton({
         maxLength={500}
         rows={2}
         placeholder={`Why are you reporting this ${targetType}?`}
-        className="w-full border border-zinc-300 bg-white px-3 py-2 text-xs outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900"
+        className={inputClass}
       />
-      {status && (
-        <span className="text-xs text-red-600 dark:text-red-400">{status}</span>
-      )}
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="bg-zinc-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
-        >
+      {status && <span className="text-small text-danger">{status}</span>}
+      <div className="flex items-center gap-2">
+        <Button type="submit" size="sm" disabled={pending}>
           {pending ? "Sending..." : "Submit report"}
-        </button>
+        </Button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="text-xs text-zinc-400"
+          className="text-meta text-fg-subtle transition-colors hover:text-fg"
         >
           Cancel
         </button>

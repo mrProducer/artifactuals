@@ -1,13 +1,15 @@
+// Muted swatches (~lightness 0.6) so avatars read as content and sit under
+// the monochrome chrome rather than fighting the accent (DESIGN.md §8.4).
 const PALETTE = [
-  "bg-rose-500",
-  "bg-orange-500",
-  "bg-amber-500",
-  "bg-emerald-500",
-  "bg-teal-500",
-  "bg-sky-500",
-  "bg-indigo-500",
-  "bg-violet-500",
-  "bg-fuchsia-500",
+  "bg-rose-500/85",
+  "bg-orange-500/85",
+  "bg-amber-500/85",
+  "bg-emerald-500/85",
+  "bg-teal-500/85",
+  "bg-sky-500/85",
+  "bg-indigo-500/85",
+  "bg-violet-500/85",
+  "bg-fuchsia-500/85",
 ];
 
 function hashString(s: string) {
@@ -42,7 +44,7 @@ export function Avatar({
       <img
         src={imageUrl}
         alt={name}
-        className={`${SIZES[size]} shrink-0 rounded-full object-cover`}
+        className={`${SIZES[size]} shrink-0 rounded-full object-cover ring-1 ring-border`}
       />
     );
   }
@@ -59,7 +61,7 @@ export function Avatar({
 
   return (
     <span
-      className={`${SIZES[size]} ${color} flex shrink-0 items-center justify-center rounded-full font-semibold text-white`}
+      className={`${SIZES[size]} ${color} flex shrink-0 items-center justify-center rounded-full font-semibold text-white ring-1 ring-border`}
       aria-hidden="true"
     >
       {initials || "?"}

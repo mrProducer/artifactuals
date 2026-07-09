@@ -42,16 +42,17 @@ export function LikeButton({
       onClick={handleClick}
       disabled={pending}
       aria-pressed={liked}
-      className={`flex items-center gap-1.5 border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+      aria-label={liked ? "Unlike" : "Like"}
+      className={`inline-flex h-10 items-center gap-1.5 border px-4 text-small font-medium transition-colors ${
         liked
-          ? "border-rose-300 bg-rose-50 text-rose-600 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-400"
-          : "border-zinc-300 text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+          ? "border-like/40 bg-like/10 text-like"
+          : "border-border text-fg-muted hover:border-border-strong hover:text-fg"
       }`}
     >
       <Heart
         size={18}
         weight={liked ? "fill" : "regular"}
-        className={liked ? "text-rose-500" : undefined}
+        className={liked ? "text-like" : undefined}
       />
       {count}
     </button>

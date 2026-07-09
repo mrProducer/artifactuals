@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/avatar";
 import { resolveAvatarUrl } from "@/lib/profile";
 import { SignOutButton } from "@/components/sign-out-button";
+import { Logo } from "@/components/ui/logo";
+import { NavLink } from "@/components/ui/nav-link";
+import { buttonClass } from "@/components/ui/button";
 
 export async function SiteHeader() {
   const supabase = await createClient();
@@ -26,36 +29,28 @@ export async function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/95 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
-      <div className="mx-auto flex h-12 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
+    <header className="sticky top-0 z-10 border-b border-border bg-surface/85 shadow-sm backdrop-blur">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-6">
-          <Link
-            href="/"
-            className="text-[15px] font-semibold tracking-tight text-zinc-950 dark:text-zinc-50"
-          >
-            Artifactuals
+          <Link href="/" className="flex items-center gap-2" aria-label="Artifactuals home">
+            <Logo className="size-6" />
+            <span className="text-title font-semibold tracking-tight text-fg">
+              artifactuals
+            </span>
           </Link>
-          <Link
-            href="/feed"
-            className="text-sm text-zinc-500 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
-          >
-            Feed
-          </Link>
+          <NavLink href="/feed">Feed</NavLink>
         </div>
 
-        <nav className="flex items-center gap-2 text-sm">
+        <nav className="flex items-center gap-2">
           {user ? (
             <>
-              <Link
-                href="/new"
-                className="border border-zinc-950 bg-zinc-950 px-3.5 py-1 font-medium text-white transition-colors hover:bg-zinc-700 active:translate-y-px dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-300"
-              >
+              <Link href="/new" className={buttonClass({ size: "sm" })}>
                 New
               </Link>
               {profile ? (
                 <Link
                   href={`/${profile.username}`}
-                  className="flex items-center gap-2 px-1.5 py-1 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                  className="flex items-center gap-2 px-1.5 py-1 text-small transition-colors hover:bg-surface-muted"
                 >
                   <Avatar
                     name={profile.display_name}
@@ -69,7 +64,7 @@ export async function SiteHeader() {
               ) : (
                 <Link
                   href="/onboarding"
-                  className="font-medium text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+                  className="text-small font-medium text-fg-muted hover:text-fg"
                 >
                   Finish setup
                 </Link>
@@ -77,10 +72,7 @@ export async function SiteHeader() {
               <SignOutButton />
             </>
           ) : (
-            <Link
-              href="/login"
-              className="border border-zinc-950 bg-zinc-950 px-3.5 py-1 font-medium text-white transition-colors hover:bg-zinc-700 active:translate-y-px dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-300"
-            >
+            <Link href="/login" className={buttonClass({ size: "sm" })}>
               Sign in
             </Link>
           )}

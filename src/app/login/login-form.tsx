@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleLogo, GithubLogo } from "@phosphor-icons/react";
 import { createClient } from "@/lib/supabase/client";
+import { inputClass } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type Mode = "sign-in" | "sign-up";
 type OAuthProvider = "google" | "github";
@@ -60,11 +62,8 @@ export function LoginForm() {
     router.refresh();
   }
 
-  const inputClass =
-    "w-full border border-zinc-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400";
-
   const oauthClass =
-    "flex w-full items-center justify-center gap-2.5 border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:border-zinc-950 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-zinc-50";
+    "flex w-full items-center justify-center gap-2.5 border border-border bg-surface px-4 py-2.5 text-small font-medium text-fg transition-colors hover:border-border-strong disabled:opacity-50";
 
   return (
     <div className="mt-8 flex flex-col gap-4">
@@ -99,16 +98,16 @@ export function LoginForm() {
             )}
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-zinc-400 dark:text-zinc-600">
-            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+          <div className="flex items-center gap-3 font-mono text-meta uppercase text-fg-subtle">
+            <span className="h-px flex-1 bg-border" />
             or
-            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+            <span className="h-px flex-1 bg-border" />
           </div>
         </>
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
         Email
         <input
           type="email"
@@ -120,7 +119,7 @@ export function LoginForm() {
         />
       </label>
 
-      <label className="flex flex-col gap-1.5 text-sm font-medium">
+      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
         Password
         <input
           type="password"
@@ -133,21 +132,15 @@ export function LoginForm() {
         />
       </label>
 
-      {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="text-small text-danger">{error}</p>}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-2 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-      >
+      <Button type="submit" disabled={pending} className="mt-2 w-full">
         {pending
           ? "Working..."
           : mode === "sign-in"
             ? "Sign in"
             : "Create account"}
-      </button>
+      </Button>
 
       <button
         type="button"
@@ -155,7 +148,7 @@ export function LoginForm() {
           setMode(mode === "sign-in" ? "sign-up" : "sign-in");
           setError(null);
         }}
-        className="text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+        className="text-small text-fg-muted transition-colors hover:text-fg"
       >
         {mode === "sign-in"
           ? "New here? Create an account"
