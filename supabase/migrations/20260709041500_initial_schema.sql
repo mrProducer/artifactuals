@@ -236,6 +236,27 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
+-- Grants: new tables are no longer auto-exposed to Data API roles, so grant
+-- explicitly. RLS below still constrains what rows each role can touch.
+-- ---------------------------------------------------------------------------
+
+grant select on public.profiles, public.artifacts, public.comments,
+  public.follows, public.likes to anon, authenticated;
+
+grant insert, update on public.profiles to authenticated;
+grant insert, update, delete on public.artifacts to authenticated;
+grant insert, delete on public.comments to authenticated;
+grant insert, delete on public.follows to authenticated;
+grant insert, delete on public.likes to authenticated;
+grant insert on public.reports to authenticated;
+
+grant all on public.profiles, public.artifacts, public.comments,
+  public.follows, public.likes, public.reports to service_role;
+
+grant execute on function public.increment_view_count(uuid) to anon, authenticated;
+grant execute on function public.recompute_trending_scores() to service_role;
+
+-- ---------------------------------------------------------------------------
 -- Row Level Security
 -- ---------------------------------------------------------------------------
 
