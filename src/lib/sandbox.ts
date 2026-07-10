@@ -45,7 +45,10 @@ function buildCsp(appOrigin: string): string {
     "form-action 'none'",
     "base-uri 'none'",
     `frame-ancestors ${frameAncestors(appOrigin)}`,
-    "sandbox allow-scripts",
+    // Must mirror the iframe `sandbox` attribute (the effective sandbox is the
+    // intersection of the two). allow-popups[-to-escape-sandbox] lets external
+    // links open in a normal new tab.
+    "sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox",
   ].join("; ");
 }
 

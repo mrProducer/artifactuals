@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type SettingsState = { error: string } | { success: true } | null;
 
@@ -88,13 +89,17 @@ export async function updateProfile(
     }
     const ext = avatar.type.split("/")[1] === "jpeg" ? "jpg" : avatar.type.split("/")[1];
     const path = `${user.id}/avatar.${ext}`;
-    const { error: uploadError } = await supabase.storage
+    // Upload with the service-role client: the user is verified above and the
+    // path is locked to their own folder. The cookie-based server client's
+    // token isn't accepted by Storage RLS, which is what threw before.
+    const admin = createAdminClient();
+    const { error: uploadError } = await admin.storage
       .from("avatars")
       .upload(path, avatar, { upsert: true, contentType: avatar.type });
     if (uploadError) {
       return { error: "Avatar upload failed. Please try again." };
     }
-    const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+    const { data } = admin.storage.from("avatars").getPublicUrl(path);
     // Cache-bust so the new image shows immediately
     avatarUrl = `${data.publicUrl}?v=${Date.now()}`;
   }
