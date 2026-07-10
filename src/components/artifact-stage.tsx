@@ -24,14 +24,11 @@ import {
 import { Avatar } from "@/components/avatar";
 import { ArtifactFrame } from "@/components/artifact-frame";
 import { toggleLike } from "@/app/actions/social";
-import { toast } from "@/components/ui/toast";
 import {
-  artifactShareText,
   canShareImageFiles,
-  downloadImage,
   shareArtifactImage,
   xIntentUrl,
-  LINKEDIN_COMPOSER_URL,
+  linkedInShareUrl,
 } from "@/lib/share";
 
 /**
@@ -162,19 +159,11 @@ export function ArtifactStage({
     window.open(xIntentUrl(title, shareUrl), "_blank", "noopener,noreferrer");
   }
 
-  async function handleLinkedIn() {
-    try {
-      await navigator.clipboard.writeText(artifactShareText(title, shareUrl));
-    } catch {
-      /* clipboard may be blocked; still open the composer */
-    }
-    const downloaded = previewImageUrl ? await downloadImage(previewImageUrl) : false;
-    window.open(LINKEDIN_COMPOSER_URL, "_blank", "noopener,noreferrer");
-    toast(
-      downloaded
-        ? "Caption copied & screenshot downloaded — paste it, then attach the image in LinkedIn."
-        : "Caption copied — paste it into your LinkedIn post."
-    );
+  function handleLinkedIn() {
+    // Opens LinkedIn's composer with the artifact unfurled as a rich card
+    // (screenshot + title from our OG tags). LinkedIn doesn't allow prefilled
+    // text, so the user adds their own note — this is the seamless standard.
+    window.open(linkedInShareUrl(shareUrl), "_blank", "noopener,noreferrer");
   }
 
   function revealDetails(target?: "comments") {

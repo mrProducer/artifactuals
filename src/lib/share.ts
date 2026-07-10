@@ -130,6 +130,15 @@ export function xIntentUrl(title: string, url: string): string {
   )}`;
 }
 
-/** LinkedIn's feed composer (no text/image params exist; we assist manually). */
-export const LINKEDIN_COMPOSER_URL =
-  "https://www.linkedin.com/feed/?shareActive=true";
+/**
+ * LinkedIn's only public share entry point. It can't take prefilled text or an
+ * image (removed years ago to curb spam) — it opens the composer and unfurls
+ * the URL's Open Graph tags into a rich card. Because our per-artifact OG image
+ * is the screenshot, the LinkedIn post shows the artifact preview automatically;
+ * the user just adds their own note.
+ */
+export function linkedInShareUrl(url: string): string {
+  return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+    url
+  )}`;
+}
