@@ -141,6 +141,7 @@ export default async function ArtifactPage({ params }: Props) {
         creatorName={creator?.display_name ?? null}
         creatorUsername={creator?.username ?? null}
         creatorAvatarUrl={creator ? resolveAvatarUrl(creator) : null}
+        previewImageUrl={artifact.preview_image_url}
         initialLiked={likeRow !== null}
         initialLikeCount={artifact.like_count}
         viewCount={artifact.view_count}
@@ -176,6 +177,7 @@ export default async function ArtifactPage({ params }: Props) {
           <ShareButtons
             url={`${siteUrl}/a/${artifact.id}`}
             title={artifact.title}
+            imageUrl={artifact.preview_image_url}
           />
           <ReportButton
             targetType="artifact"

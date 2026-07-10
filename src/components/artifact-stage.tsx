@@ -12,6 +12,8 @@ import {
 import { Avatar } from "@/components/avatar";
 import { ArtifactFrame } from "@/components/artifact-frame";
 import { toggleLike } from "@/app/actions/social";
+import { shareArtifactImage } from "@/lib/share";
+import { toast } from "@/components/ui/toast";
 
 /**
  * Full-viewport artifact stage: the live artifact fills the space under the
@@ -27,6 +29,7 @@ export function ArtifactStage({
   creatorName,
   creatorUsername,
   creatorAvatarUrl,
+  previewImageUrl,
   initialLiked,
   initialLikeCount,
   viewCount,
@@ -40,6 +43,7 @@ export function ArtifactStage({
   creatorName: string | null;
   creatorUsername: string | null;
   creatorAvatarUrl: string | null;
+  previewImageUrl: string | null;
   initialLiked: boolean;
   initialLikeCount: number;
   viewCount: number;
@@ -99,18 +103,18 @@ export function ArtifactStage({
   }
 
   async function handleShare() {
-    if (navigator.share) {
-      try {
-        await navigator.share({ title, url: shareUrl });
-        return;
-      } catch {
-        /* dismissed → fall through to copy */
-      }
-    }
+    const outcome = await shareArtifactImage({
+      title,
+      url: shareUrl,
+      imageUrl: previewImageUrl,
+    });
+    if (outcome === "shared" || outcome === "cancelled") return;
+    // No native share (desktop) → copy the link and nudge toward the buttons.
     try {
       await navigator.clipboard.writeText(shareUrl);
       setShared(true);
       setTimeout(() => setShared(false), 2000);
+      toast("Link copied — scroll down to post on X or LinkedIn.");
     } catch {
       /* ignore */
     }
