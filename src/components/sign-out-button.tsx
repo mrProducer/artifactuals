@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { SignOut } from "@phosphor-icons/react";
 import { createClient } from "@/lib/supabase/client";
 
 export function SignOutButton() {
@@ -16,9 +17,11 @@ export function SignOutButton() {
   return (
     <button
       onClick={handleSignOut}
-      className="px-2 py-1 text-small text-fg-muted transition-colors hover:text-fg"
+      aria-label="Sign out"
+      className="flex items-center px-2 py-1 text-small text-fg-muted transition-colors hover:text-fg"
     >
-      Sign out
+      <SignOut className="size-4 sm:hidden" />
+      <span className="hidden sm:inline">Sign out</span>
     </button>
   );
 }

@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Avatar } from "@/components/avatar";
 import { resolveAvatarUrl } from "@/lib/profile";
-import { ArtifactViewer } from "@/components/artifact-viewer";
-import { LikeButton } from "@/components/like-button";
+import { ArtifactStage } from "@/components/artifact-stage";
 import { ShareButtons } from "@/components/share-buttons";
 import { ReportButton } from "@/components/report-button";
 import { CommentsSection, type CommentItem } from "@/components/comments-section";
@@ -133,87 +130,66 @@ export default async function ArtifactPage({ params }: Props) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-6 sm:px-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-h1 text-fg">{artifact.title}</h1>
-          {artifact.description && (
-            <p className="mt-1 max-w-[68ch] text-body text-fg-muted">
-              {artifact.description}
-            </p>
-          )}
-          {creator && (
-            <Link
-              href={`/${creator.username}`}
-              className="mt-3 flex items-center gap-2"
-            >
-              <Avatar
-                name={creator.display_name}
-                imageUrl={resolveAvatarUrl(creator)}
-                size="sm"
-              />
-              <span className="text-small font-medium text-fg">
-                {creator.display_name}
-              </span>
-              <span className="font-mono text-meta text-fg-subtle">
-                @{creator.username}
-              </span>
-            </Link>
-          )}
-        </div>
+    <div className="flex-1">
+      {/* The live artifact fills the viewport under the site header, with a
+          bottom action bar. Details and comments live below the fold. */}
+      <ArtifactStage
+        src={`${sandboxBaseUrl()}/sandbox/a/${artifact.id}`}
+        title={artifact.title}
+        shareUrl={`${siteUrl}/a/${artifact.id}`}
+        artifactId={artifact.id}
+        creatorName={creator?.display_name ?? null}
+        creatorUsername={creator?.username ?? null}
+        creatorAvatarUrl={creator ? resolveAvatarUrl(creator) : null}
+        initialLiked={likeRow !== null}
+        initialLikeCount={artifact.like_count}
+        viewCount={artifact.view_count}
+        commentCount={artifact.comment_count}
+        signedIn={user !== null}
+      />
 
-        <div className="flex items-center gap-3">
-          <LikeButton
-            artifactId={artifact.id}
-            initialLiked={likeRow !== null}
-            initialCount={artifact.like_count}
+      <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
+        {artifact.description && (
+          <p className="max-w-[68ch] text-body text-fg-muted">
+            {artifact.description}
+          </p>
+        )}
+
+        {artifact.tags.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {artifact.tags.map((tag) => (
+              <Badge key={tag}>{tag}</Badge>
+            ))}
+          </div>
+        )}
+
+        {isOwner && (
+          <div className="mt-6 border-t border-border pt-6">
+            <ArtifactOwnerToolbar
+              artifactId={artifact.id}
+              isPinned={artifact.is_pinned}
+            />
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
+          <ShareButtons
+            url={`${siteUrl}/a/${artifact.id}`}
+            title={artifact.title}
+          />
+          <ReportButton
+            targetType="artifact"
+            targetId={artifact.id}
             signedIn={user !== null}
           />
-          <span className="font-mono text-meta text-fg-subtle">
-            {artifact.view_count} views
-          </span>
         </div>
-      </div>
 
-      {artifact.tags.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {artifact.tags.map((tag) => (
-            <Badge key={tag}>{tag}</Badge>
-          ))}
-        </div>
-      )}
-
-      {isOwner && (
-        <div className="mt-4 border-t border-border pt-4">
-          <ArtifactOwnerToolbar
-            artifactId={artifact.id}
-            isPinned={artifact.is_pinned}
-          />
-        </div>
-      )}
-
-      {/* The live artifact */}
-      <div className="mt-5">
-        <ArtifactViewer
-          src={`${sandboxBaseUrl()}/sandbox/a/${artifact.id}`}
-          title={artifact.title}
+        <CommentsSection
+          artifactId={artifact.id}
+          comments={(comments ?? []) as CommentItem[]}
+          currentUserId={user?.id ?? null}
         />
       </div>
-
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <ShareButtons url={`${siteUrl}/a/${artifact.id}`} title={artifact.title} />
-        <ReportButton
-          targetType="artifact"
-          targetId={artifact.id}
-          signedIn={user !== null}
-        />
-      </div>
-
-      <CommentsSection
-        artifactId={artifact.id}
-        comments={(comments ?? []) as CommentItem[]}
-        currentUserId={user?.id ?? null}
-      />
-    </main>
+    </div>
   );
 }

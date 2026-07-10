@@ -35,11 +35,11 @@ export async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-surface/85 shadow-sm backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
-        <div className="flex items-center gap-6">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           <Link href="/" className="flex items-center gap-2" aria-label="Artifactuals home">
-            <Logo className="size-6" />
-            <span className="text-title font-semibold tracking-tight text-fg">
+            <Logo className="size-6 shrink-0" />
+            <span className="hidden text-title font-semibold tracking-tight text-fg sm:inline">
               artifactuals
             </span>
           </Link>
@@ -48,7 +48,7 @@ export async function SiteHeader() {
           {isModerator && <NavLink href="/admin">Admin</NavLink>}
         </div>
 
-        <nav className="flex items-center gap-2">
+        <nav className="flex items-center gap-1 sm:gap-2">
           <SearchBox />
           <ThemeToggle />
           {user ? (

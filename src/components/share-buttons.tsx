@@ -14,10 +14,10 @@ export function ShareButtons({ url, title }: { url: string; title: string }) {
   const linkedInHref = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
 
   const buttonClass =
-    "inline-flex h-10 items-center border border-border bg-surface px-4 text-small font-medium text-fg transition-colors hover:border-border-strong";
+    "inline-flex h-10 flex-1 items-center justify-center border border-border bg-surface px-4 text-small font-medium text-fg transition-colors hover:border-border-strong sm:flex-none sm:justify-start";
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
       <a
         href={xHref}
         target="_blank"
