@@ -5,6 +5,8 @@ import { useActionState } from "react";
 import { updateProfile, type SettingsState } from "./actions";
 import { inputClass } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { AvatarEditor } from "@/components/avatar-editor";
+import { resolveAvatarUrl } from "@/lib/profile";
 
 type ProfileData = {
   username: string;
@@ -48,19 +50,10 @@ export function ProfileSettingsForm({ profile }: { profile: ProfileData }) {
         />
       </label>
 
-      <label className="flex flex-col gap-1.5 text-small font-medium text-fg">
-        Photo
-        <input
-          type="file"
-          name="avatar"
-          accept="image/png,image/jpeg,image/webp"
-          className="text-small text-fg-muted file:mr-3 file:border-0 file:bg-surface-muted file:px-3 file:py-2 file:text-small file:font-medium file:text-fg-muted"
-        />
-        <span className="text-meta font-normal text-fg-subtle">
-          PNG, JPEG, or WebP up to 2 MB. Leave empty to keep your current
-          photo.
-        </span>
-      </label>
+      <AvatarEditor
+        currentUrl={resolveAvatarUrl(profile)}
+        name={profile.display_name}
+      />
 
       <hr className="border-border" />
 
