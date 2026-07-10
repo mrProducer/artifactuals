@@ -40,6 +40,25 @@ export function canShareFiles(files: File[]): boolean {
   );
 }
 
+/**
+ * Whether the native sheet can share an image file at all (probed with a tiny
+ * dummy PNG). On mobile this is the route to the LinkedIn/X *apps* — the sheet
+ * lists installed apps as targets and hands them the screenshot + caption.
+ */
+export function canShareImageFiles(): boolean {
+  if (typeof navigator === "undefined" || typeof navigator.canShare !== "function") {
+    return false;
+  }
+  try {
+    const probe = new File([new Uint8Array([137, 80, 78, 71])], "probe.png", {
+      type: "image/png",
+    });
+    return navigator.canShare({ files: [probe] });
+  } catch {
+    return false;
+  }
+}
+
 export type ShareOutcome = "shared" | "cancelled" | "unsupported" | "error";
 
 /**
