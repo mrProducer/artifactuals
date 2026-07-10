@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { resolveAvatarUrl } from "@/lib/profile";
 import { ArtifactStage } from "@/components/artifact-stage";
-import { ShareButtons } from "@/components/share-buttons";
 import { ReportButton } from "@/components/report-button";
 import { CommentsSection, type CommentItem } from "@/components/comments-section";
 import { ArtifactOwnerToolbar } from "@/components/artifact-owner-toolbar";
@@ -131,8 +130,9 @@ export default async function ArtifactPage({ params }: Props) {
 
   return (
     <div className="flex-1">
-      {/* The live artifact fills the viewport under the site header, with a
-          bottom action bar. Details and comments live below the fold. */}
+      {/* The live artifact fills the viewport under the site header. Its
+          persistent bottom bar holds like/comment/share; the description,
+          tags, and comments below are revealed by the bar's Details toggle. */}
       <ArtifactStage
         src={`${sandboxBaseUrl()}/sandbox/a/${artifact.id}`}
         title={artifact.title}
@@ -147,51 +147,46 @@ export default async function ArtifactPage({ params }: Props) {
         viewCount={artifact.view_count}
         commentCount={artifact.comment_count}
         signedIn={user !== null}
-      />
+      >
+        <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
+          {artifact.description && (
+            <p className="max-w-[68ch] text-body text-fg-muted">
+              {artifact.description}
+            </p>
+          )}
 
-      <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
-        {artifact.description && (
-          <p className="max-w-[68ch] text-body text-fg-muted">
-            {artifact.description}
-          </p>
-        )}
+          {artifact.tags.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {artifact.tags.map((tag) => (
+                <Badge key={tag}>{tag}</Badge>
+              ))}
+            </div>
+          )}
 
-        {artifact.tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {artifact.tags.map((tag) => (
-              <Badge key={tag}>{tag}</Badge>
-            ))}
-          </div>
-        )}
+          {isOwner && (
+            <div className="mt-6 border-t border-border pt-6">
+              <ArtifactOwnerToolbar
+                artifactId={artifact.id}
+                isPinned={artifact.is_pinned}
+              />
+            </div>
+          )}
 
-        {isOwner && (
-          <div className="mt-6 border-t border-border pt-6">
-            <ArtifactOwnerToolbar
-              artifactId={artifact.id}
-              isPinned={artifact.is_pinned}
+          <div className="mt-6 flex items-center justify-end border-t border-border pt-6">
+            <ReportButton
+              targetType="artifact"
+              targetId={artifact.id}
+              signedIn={user !== null}
             />
           </div>
-        )}
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
-          <ShareButtons
-            url={`${siteUrl}/a/${artifact.id}`}
-            title={artifact.title}
-            imageUrl={artifact.preview_image_url}
-          />
-          <ReportButton
-            targetType="artifact"
-            targetId={artifact.id}
-            signedIn={user !== null}
+          <CommentsSection
+            artifactId={artifact.id}
+            comments={(comments ?? []) as CommentItem[]}
+            currentUserId={user?.id ?? null}
           />
         </div>
-
-        <CommentsSection
-          artifactId={artifact.id}
-          comments={(comments ?? []) as CommentItem[]}
-          currentUserId={user?.id ?? null}
-        />
-      </div>
+      </ArtifactStage>
     </div>
   );
 }

@@ -1,25 +1,46 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+  type ReactNode,
+} from "react";
 import Link from "next/link";
 import {
   Heart,
   ChatCircle,
-  PaperPlaneTilt,
+  ShareNetwork,
+  XLogo,
+  LinkedinLogo,
+  LinkSimple,
+  CaretDown,
+  CaretUp,
   ArrowsOut,
   ArrowsIn,
 } from "@phosphor-icons/react";
 import { Avatar } from "@/components/avatar";
 import { ArtifactFrame } from "@/components/artifact-frame";
 import { toggleLike } from "@/app/actions/social";
-import { shareArtifactImage } from "@/lib/share";
 import { toast } from "@/components/ui/toast";
+import {
+  artifactShareText,
+  canShareImageFiles,
+  downloadImage,
+  shareArtifactImage,
+  xIntentUrl,
+  LINKEDIN_COMPOSER_URL,
+} from "@/lib/share";
 
 /**
- * Full-viewport artifact stage: the live artifact fills the space under the
- * site header, with a bottom action bar (like / comment / share / fullscreen)
- * — thumb-reachable on mobile. Fullscreen expands to a fixed overlay that
- * covers the site chrome; the bottom bar stays so the user can act and exit.
+ * Full-viewport artifact stage. The live artifact fills the space under the
+ * site header; a persistent bottom bar holds the primary actions — like,
+ * comment, and sharing (native app sheet on touch, per-network buttons on
+ * desktop) — so nothing important sits below an invisible fold. A prominent
+ * "Details" toggle reveals the description/tags/comments (passed as children)
+ * on demand. Fullscreen expands the artifact to a fixed overlay.
  */
 export function ArtifactStage({
   src,
@@ -35,6 +56,7 @@ export function ArtifactStage({
   viewCount,
   commentCount,
   signedIn,
+  children,
 }: {
   src: string;
   title: string;
@@ -49,14 +71,29 @@ export function ArtifactStage({
   viewCount: number;
   commentCount: number;
   signedIn: boolean;
+  children?: ReactNode;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const detailsRef = useRef<HTMLDivElement>(null);
   const [fullscreen, setFullscreen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [popKey, setPopKey] = useState(0);
-  const [shared, setShared] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [, startTransition] = useTransition();
+
+  // On touch devices that can share image files, the native sheet is the route
+  // into the LinkedIn/X apps (with the screenshot attached) — prefer it there.
+  const preferNative = useSyncExternalStore(
+    (cb) => {
+      const mq = window.matchMedia("(pointer: coarse)");
+      mq.addEventListener("change", cb);
+      return () => mq.removeEventListener("change", cb);
+    },
+    () => window.matchMedia("(pointer: coarse)").matches && canShareImageFiles(),
+    () => false
+  );
 
   useEffect(() => {
     const onChange = () => {
@@ -77,7 +114,7 @@ export function ArtifactStage({
 
   function enterFullscreen() {
     setFullscreen(true);
-    containerRef.current?.requestFullscreen?.().catch(() => {});
+    stageRef.current?.requestFullscreen?.().catch(() => {});
   }
   function exitFullscreen() {
     setFullscreen(false);
@@ -102,111 +139,208 @@ export function ArtifactStage({
     });
   }
 
-  async function handleShare() {
-    const outcome = await shareArtifactImage({
-      title,
-      url: shareUrl,
-      imageUrl: previewImageUrl,
-    });
-    if (outcome === "shared" || outcome === "cancelled") return;
-    // No native share (desktop) → copy the link and nudge toward the buttons.
+  async function copyLink() {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      setShared(true);
-      setTimeout(() => setShared(false), 2000);
-      toast("Link copied — scroll down to post on X or LinkedIn.");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch {
       /* ignore */
     }
   }
 
+  async function handleNativeShare() {
+    const outcome = await shareArtifactImage({
+      title,
+      url: shareUrl,
+      imageUrl: previewImageUrl,
+    });
+    if (outcome === "error" || outcome === "unsupported") await copyLink();
+  }
+
+  function handleX() {
+    window.open(xIntentUrl(title, shareUrl), "_blank", "noopener,noreferrer");
+  }
+
+  async function handleLinkedIn() {
+    try {
+      await navigator.clipboard.writeText(artifactShareText(title, shareUrl));
+    } catch {
+      /* clipboard may be blocked; still open the composer */
+    }
+    const downloaded = previewImageUrl ? await downloadImage(previewImageUrl) : false;
+    window.open(LINKEDIN_COMPOSER_URL, "_blank", "noopener,noreferrer");
+    toast(
+      downloaded
+        ? "Caption copied & screenshot downloaded — paste it, then attach the image in LinkedIn."
+        : "Caption copied — paste it into your LinkedIn post."
+    );
+  }
+
+  function revealDetails(target?: "comments") {
+    setExpanded(true);
+    // Wait for the children to mount before scrolling to them.
+    requestAnimationFrame(() =>
+      setTimeout(() => {
+        const el =
+          target === "comments"
+            ? document.getElementById("comments")
+            : detailsRef.current;
+        el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 40)
+    );
+  }
+
+  function toggleDetails() {
+    if (expanded) {
+      setExpanded(false);
+      stageRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      revealDetails();
+    }
+  }
+
   function goToComments() {
     exitFullscreen();
-    document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
+    if (expanded) {
+      document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      revealDetails("comments");
+    }
   }
 
   const barButton =
-    "flex items-center gap-1.5 rounded-none px-3 py-2 text-small font-medium text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg active:scale-[0.97]";
+    "flex items-center gap-1.5 px-2.5 py-2 text-small font-medium text-fg-muted transition-colors hover:bg-surface-muted hover:text-fg active:scale-[0.97] sm:px-3";
 
   return (
-    <div
-      ref={containerRef}
-      className={
-        fullscreen
-          ? "fixed inset-0 z-50 flex flex-col bg-bg"
-          : "flex h-[calc(100dvh-3.5rem)] flex-col border-b border-border bg-surface"
-      }
-    >
-      {/* Compact context strip */}
-      <div className="flex h-12 shrink-0 items-center gap-2 border-b border-border bg-surface px-3 sm:px-4">
-        {creatorUsername ? (
-          <Link
-            href={`/${creatorUsername}`}
-            className="flex min-w-0 items-center gap-2"
-          >
-            <Avatar name={creatorName ?? "?"} imageUrl={creatorAvatarUrl} size="sm" />
-            <span className="flex min-w-0 flex-col leading-tight">
-              <span className="truncate text-small font-semibold text-fg">
-                {title}
+    <div className="flex flex-col">
+      <div
+        ref={stageRef}
+        className={
+          fullscreen
+            ? "fixed inset-0 z-50 flex flex-col bg-bg"
+            : "flex h-[calc(100dvh-3.5rem)] flex-col border-b border-border bg-surface"
+        }
+      >
+        {/* Compact context strip */}
+        <div className="flex h-12 shrink-0 items-center gap-2 border-b border-border bg-surface px-3 sm:px-4">
+          {creatorUsername ? (
+            <Link
+              href={`/${creatorUsername}`}
+              className="flex min-w-0 items-center gap-2"
+            >
+              <Avatar
+                name={creatorName ?? "?"}
+                imageUrl={creatorAvatarUrl}
+                size="sm"
+              />
+              <span className="flex min-w-0 flex-col leading-tight">
+                <span className="truncate text-small font-semibold text-fg">
+                  {title}
+                </span>
+                <span className="truncate font-mono text-meta text-fg-subtle">
+                  @{creatorUsername} · {viewCount} views
+                </span>
               </span>
-              <span className="truncate font-mono text-meta text-fg-subtle">
-                @{creatorUsername} · {viewCount} views
-              </span>
+            </Link>
+          ) : (
+            <span className="truncate text-small font-semibold text-fg">
+              {title}
             </span>
-          </Link>
-        ) : (
-          <span className="truncate text-small font-semibold text-fg">
-            {title}
-          </span>
-        )}
-      </div>
-
-      <ArtifactFrame
-        src={src}
-        title={title}
-        className="w-full flex-1 border-0 bg-surface"
-      />
-
-      {/* Bottom action bar */}
-      <div className="flex shrink-0 items-center justify-between border-t border-border bg-surface px-1 sm:px-3">
-        <div className="flex items-center">
-          <button
-            onClick={handleLike}
-            aria-pressed={liked}
-            aria-label={liked ? "Unlike" : "Like"}
-            className={barButton}
-          >
-            <Heart
-              key={popKey}
-              size={22}
-              weight={liked ? "fill" : "regular"}
-              className={liked ? "animate-like-pop text-like" : undefined}
-            />
-            {likeCount > 0 && <span>{likeCount}</span>}
-          </button>
-
-          <button onClick={goToComments} aria-label="Comments" className={barButton}>
-            <ChatCircle size={22} />
-            {commentCount > 0 && <span>{commentCount}</span>}
-          </button>
-
-          <button onClick={handleShare} aria-label="Share" className={barButton}>
-            <PaperPlaneTilt size={22} />
-            <span className="hidden sm:inline">{shared ? "Copied" : "Share"}</span>
-          </button>
+          )}
         </div>
 
-        <button
-          onClick={fullscreen ? exitFullscreen : enterFullscreen}
-          aria-label={fullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-          className={barButton}
-        >
-          {fullscreen ? <ArrowsIn size={20} /> : <ArrowsOut size={20} />}
-          <span className="hidden sm:inline">
-            {fullscreen ? "Exit" : "Fullscreen"}
-          </span>
-        </button>
+        <ArtifactFrame
+          src={src}
+          title={title}
+          className="w-full flex-1 border-0 bg-surface"
+        />
+
+        {/* Persistent action bar */}
+        <div className="flex shrink-0 items-center justify-between gap-1 border-t border-border bg-surface px-1 sm:px-2">
+          <div className="flex items-center">
+            <button
+              onClick={handleLike}
+              aria-pressed={liked}
+              aria-label={liked ? "Unlike" : "Like"}
+              className={barButton}
+            >
+              <Heart
+                key={popKey}
+                size={22}
+                weight={liked ? "fill" : "regular"}
+                className={liked ? "animate-like-pop text-like" : undefined}
+              />
+              {likeCount > 0 && <span>{likeCount}</span>}
+            </button>
+
+            <button onClick={goToComments} aria-label="Comments" className={barButton}>
+              <ChatCircle size={22} />
+              {commentCount > 0 && <span>{commentCount}</span>}
+            </button>
+          </div>
+
+          <div className="flex items-center">
+            {/* Sharing — native app sheet on touch, web composers on desktop */}
+            {preferNative ? (
+              <button
+                onClick={handleNativeShare}
+                aria-label="Share"
+                className={barButton}
+              >
+                <ShareNetwork size={22} weight="bold" />
+                Share
+              </button>
+            ) : (
+              <>
+                <button onClick={handleX} aria-label="Post on X" className={barButton}>
+                  <XLogo size={20} weight="bold" />
+                  <span className="hidden md:inline">X</span>
+                </button>
+                <button
+                  onClick={handleLinkedIn}
+                  aria-label="Post on LinkedIn"
+                  className={barButton}
+                >
+                  <LinkedinLogo size={20} weight="bold" />
+                  <span className="hidden md:inline">LinkedIn</span>
+                </button>
+                <button
+                  onClick={copyLink}
+                  aria-label="Copy link"
+                  className={barButton}
+                >
+                  <LinkSimple size={20} weight="bold" />
+                  <span className="hidden md:inline">
+                    {copied ? "Copied!" : "Copy"}
+                  </span>
+                </button>
+              </>
+            )}
+
+            {!fullscreen && (
+              <button
+                onClick={toggleDetails}
+                aria-expanded={expanded}
+                className="flex items-center gap-1.5 border-l border-border px-2.5 py-2 text-small font-semibold text-fg transition-colors hover:bg-surface-muted sm:px-3"
+              >
+                {expanded ? <CaretUp size={18} /> : <CaretDown size={18} />}
+                {expanded ? "Hide" : "Details"}
+              </button>
+            )}
+
+            <button
+              onClick={fullscreen ? exitFullscreen : enterFullscreen}
+              aria-label={fullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+              className={barButton}
+            >
+              {fullscreen ? <ArrowsIn size={20} /> : <ArrowsOut size={20} />}
+            </button>
+          </div>
+        </div>
       </div>
+
+      {!fullscreen && expanded && <div ref={detailsRef}>{children}</div>}
     </div>
   );
 }
